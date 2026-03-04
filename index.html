@@ -392,6 +392,27 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 .fp-lightbox img{max-width:100%;max-height:75vh;object-fit:contain;border-radius:8px}
 .fp-lightbox-dt{color:rgba(255,255,255,.7);font-size:12px}
 .fp-lightbox-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.sg-card{background:var(--white);border-radius:14px;padding:10px 12px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--line)}
+.sg-ico{font-size:18px;margin-bottom:4px}
+.sg-num{font-size:22px;font-weight:700;color:var(--green-dark);font-family:'Playfair Display',serif;line-height:1.1}
+.sg-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-top:3px}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chart-lbl{font-size:11px;color:var(--text);width:64px;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.chart-bar-wrap{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.chart-bar{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.chart-val{font-size:11px;font-weight:600;color:var(--text-muted);width:20px;text-align:right;flex-shrink:0}
+.streak-card{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.streak-num{font-size:36px;font-weight:700;color:#fff;font-family:'Playfair Display',serif;line-height:1}
+.streak-info{flex:1}
+.streak-title{color:#fff;font-size:13px;font-weight:600;margin-bottom:2px}
+.streak-sub{color:rgba(255,255,255,.65);font-size:11px}
+.slog-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.slog-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.slog-name{font-size:13px;font-weight:500;color:var(--text)}
+.slog-type{font-size:11px;color:var(--text-muted)}
+.slog-date{font-size:11px;color:var(--text-muted);margin-left:auto;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -415,7 +436,6 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
   <div class="logo">Bot<span>aniq</span></div>
   <div class="header-actions">
     <div class="user-chip" id="uchip" onclick="showAccountMenu()">👤 <span id="ulabel">—</span></div>
-    <button class="icon-btn" onclick="openChat()">💬</button>
     <button class="icon-btn" onclick="openSheet('psheet')">＋</button>
   </div>
 </div>
@@ -500,33 +520,29 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 </div>
 
 <!-- AI TIPS -->
-<div class="scr" id="scr-tips">
-  <div class="aitips-wrap">
-    <div class="aitips-title">✨ AI Tips</div>
-    <div class="aitips-sub">Ketik nama tanaman, AI langsung kasih tips perawatan yang tepat untukmu.</div>
-    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:8px">Nama Tanaman</div>
-    <input id="care-plant-name" class="care-input" placeholder="Contoh: Kaktus, Monstera, Mawar..." oninput="checkCareBtn()" onkeydown="if(event.key==='Enter'&&!document.getElementById('abtn').disabled)doCareTips()">
-    <div class="chips-row">
-      <button class="chip" onclick="setCareQuick('Kaktus')">🌵 Kaktus</button>
-      <button class="chip" onclick="setCareQuick('Sukulen')">🪴 Sukulen</button>
-      <button class="chip" onclick="setCareQuick('Monstera')">🌿 Monstera</button>
-      <button class="chip" onclick="setCareQuick('Bonsai')">🌳 Bonsai</button>
-      <button class="chip" onclick="setCareQuick('Mawar')">🌹 Mawar</button>
-      <button class="chip" onclick="setCareQuick('Anggrek')">🌸 Anggrek</button>
-      <button class="chip" onclick="setCareQuick('Lithops')">🪨 Lithops</button>
-    </div>
-    <div class="focus-label">Fokus Tips</div>
-    <label class="careopt on" id="co-all" onclick="setCareOpt(this,'all')"><span style="font-size:18px">🌿</span><div><b>Panduan Lengkap</b> <span style="color:var(--text-muted)">— semua aspek perawatan</span></div></label>
-    <label class="careopt" id="co-water" onclick="setCareOpt(this,'water')"><span style="font-size:18px">💧</span><div><b>Penyiraman</b> <span style="color:var(--text-muted)">— jadwal dan teknik</span></div></label>
-    <label class="careopt" id="co-disease" onclick="setCareOpt(this,'disease')"><span style="font-size:18px">🦠</span><div><b>Penyakit dan Hama</b> <span style="color:var(--text-muted)">— pencegahan dan solusi</span></div></label>
-    <label class="careopt" id="co-grow" onclick="setCareOpt(this,'grow')"><span style="font-size:18px">🚀</span><div><b>Percepat Pertumbuhan</b> <span style="color:var(--text-muted)">— tips dan nutrisi</span></div></label>
-    <button class="gen-btn" id="abtn" onclick="doCareTips()" disabled>✨ Generate Tips Perawatan</button>
-    <div class="analyzing-box" id="analyzing"><div class="spin"></div><div style="font-size:14px;font-weight:500;margin-bottom:4px" id="antxt">Menganalisa...</div><div style="font-size:12px;color:var(--text-muted)">AI sedang mempelajari tanamanmu</div></div>
-    <div class="ai-result-card" id="aicard"></div>
+<div class="scr" id="scr-stats">
+  <div class="screen-hd"><div class="screen-title">📊 Statistik</div></div>
+  <div style="padding:0 20px 20px">
+
+    <!-- RINGKASAN BULAN INI -->
+    <div class="d-sec-title" style="margin-bottom:10px">Bulan Ini</div>
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- GRAFIK BATANG -->
+    <div class="d-sec-title" style="margin:16px 0 10px">Aktivitas per Jenis</div>
+    <div id="statsChart"></div>
+
+    <!-- STREAK -->
+    <div class="d-sec-title" style="margin:16px 0 10px">Streak Perawatan</div>
+    <div id="statsStreak"></div>
+
+    <!-- RIWAYAT AKTIVITAS -->
+    <div class="d-sec-title" style="margin:16px 0 10px">Semua Aktivitas</div>
+    <div id="statsLog"></div>
+
   </div>
 </div>
 
-<!-- JURNAL -->
 <div class="scr" id="scr-journal">
   <div class="screen-hd">
     <div class="screen-title">Jurnal</div>
@@ -534,10 +550,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
   </div>
   <div class="jnl-tabs">
     <button class="jtab on" id="jt-care" onclick="setJTab('care',this)">🌿 Perawatan</button>
-    <button class="jtab" id="jt-scan" onclick="setJTab('scan',this)">🔍 Riwayat AI</button>
+    <button class="jtab" id="jt-scan" onclick="setJTab('scan',this)">📷 Riwayat Scan</button>
   </div>
   <div id="jtl-care"><div class="jnl-list" id="jtl"></div></div>
-  <div id="jtl-scan" style="display:none"><div style="padding:0 20px" id="scanhist"></div></div>
+  <div id="jtl-scan" style="display:none"><div style="padding:0 20px 20px" id="scanHistJnl"></div></div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -551,8 +567,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
   <button class="nav-item center-btn" id="nav-scan" onclick="showScr('scan')">
     <div class="nav-icon">📷</div><div class="nav-label">Scan</div>
   </button>
-  <button class="nav-item" id="nav-tips" onclick="showScr('tips')">
-    <div class="nav-icon">✨</div><div class="nav-label">AI Tips</div>
+  <button class="nav-item" id="nav-stats" onclick="showScr('stats')">
+    <div class="nav-icon">📊</div><div class="nav-label">Statistik</div>
   </button>
   <button class="nav-item" id="nav-journal" onclick="showScr('journal')">
     <div class="nav-icon">📅</div><div class="nav-label">Jurnal</div>
@@ -689,7 +705,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
 <script>
 // ════ CONFIG ════
-var PLANTNET_KEY='2b10gjNV9UDMDNqm8jHEzo7Tu'; // ← ganti dengan API key Pl@ntNet kamu
+var PLANTNET_KEY='MASUKKAN_API_KEY_DISINI'; // ← ganti dengan API key Pl@ntNet kamu
 
 var SBURL='https://atinplsrmgkcgsdwvhiw.supabase.co';
 var SBKEY='sb_publishable__s0F7wR6_cJElrsrg9NjrA_R1NTzhWW';
@@ -790,6 +806,7 @@ async function loadData(){
 
 // ════ NAV ════
 function showScr(n){
+  if(n==='stats'){renderStats();}
   if(n==='scan'){pnImgData=null;var t=document.getElementById('camThumb');var o=document.getElementById('camOverlay');if(t)t.style.display='none';if(o)o.style.display='flex';var b=document.getElementById('scanBtn');if(b){b.disabled=true;b.style.opacity='.4';}document.getElementById('scanBtnTxt').textContent='🔍 Pilih foto dulu';document.getElementById('scanResult').innerHTML='';renderScanHist();}
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
   document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
@@ -1029,7 +1046,7 @@ function renderJnl(){var sorted=jnls.slice().sort(function(a,b){return new Date(
 async function saveJnl(){var plantId=parseInt(document.getElementById('jfplant').value);var type=document.getElementById('jftype').value,note=document.getElementById('jfnote').value.trim();var date=document.getElementById('jfdate').value,eid=document.getElementById('jfid').value;if(!date){toast('Pilih tanggal!');return;}var p=plants.find(function(x){return x.id===plantId;});if(eid){var idx=jnls.findIndex(function(j){return j.id===parseInt(eid);});if(idx>-1)jnls[idx]=Object.assign({},jnls[idx],{plantId,type,note,date});sbQ('bq_jnls','PATCH',{type,note,date},'id=eq.'+eid+'&username=eq.'+encodeURIComponent(CU));toast('✅ Catatan diupdate!');}else{var nj={id:jid++,plantId:plantId,type:type,note:note,date:date};var res=await sbQ('bq_jnls','POST',{username:CU,plant_id:plantId,type:type,note:note,date:date});if(res&&res[0])nj.id=res[0].id;jnls.push(nj);jid=Math.max(jid,nj.id+1);if(type==='water'&&p){p.lastWater=date;sbQ('bq_plants','PATCH',{last_water:date},'id=eq.'+plantId+'&username=eq.'+encodeURIComponent(CU));}if(type==='fert'&&p){p.lastFert=date;sbQ('bq_plants','PATCH',{last_fert:date},'id=eq.'+plantId+'&username=eq.'+encodeURIComponent(CU));}toast('📝 Catatan disimpan!');}saveLocal();closeSheet('jsheet');renderJnl();}
 async function delJnl(id){if(!confirm('Hapus catatan?'))return;jnls=jnls.filter(function(j){return j.id!==id;});saveLocal();sbQ('bq_jnls','DELETE',null,'id=eq.'+id+'&username=eq.'+encodeURIComponent(CU));toast('🗑️ Dihapus');renderJnl();}
 function editJnl(id){var j=jnls.find(function(x){return x.id===id;});if(!j)return;document.getElementById('jstitle').textContent='Edit Catatan';document.getElementById('jfid').value=id;document.getElementById('jfnote').value=j.note||'';document.getElementById('jfdate').value=j.date;document.getElementById('jftype').value=j.type;var sel=document.getElementById('jfplant');sel.innerHTML=plants.map(function(p){return'<option value="'+p.id+'" '+(p.id===j.plantId?'selected':'')+'>'+(p.emoji||'🌿')+' '+p.name+'</option>';}).join('');openSheet('jsheet');}
-function setJTab(tab,btn){document.querySelectorAll('#scr-journal .jtab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');document.getElementById('jtl-care').style.display=tab==='care'?'block':'none';document.getElementById('jtl-scan').style.display=tab==='scan'?'block':'none';if(tab==='scan')renderScanHist();}
+function setJTab(tab,btn){document.querySelectorAll('#scr-journal .jtab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');document.getElementById('jtl-care').style.display=tab==='care'?'block':'none';document.getElementById('jtl-scan').style.display=tab==='scan'?'block':'none';if(tab==='scan')renderScanHistJnl();}
 
 
 async function delScan(id){if(!confirm('Hapus riwayat?'))return;scans=scans.filter(function(x){return x.id!==id;});saveLocal();sbQ('bq_scans','DELETE',null,'id=eq.'+id+'&username=eq.'+encodeURIComponent(CU));renderScanHist();toast('🗑️ Dihapus');}
@@ -1317,6 +1334,125 @@ document.addEventListener('click',function(e){
   var btn=e.target.closest('.pn-add-btn');
   if(btn){addScanToCol(btn.dataset.nm||'',btn.dataset.sci||'');}
 });
+
+
+// ════ STATISTIK ════
+var JCOLORS={water:'#2F7EC4',fert:'#C4891A','ganti pot':'#3A8228',note:'#7B4FB5',disease:'#D94040',prune:'#1E8A63'};
+
+function renderStats(){
+  var thisMonth=new Date().toISOString().slice(0,7);
+  var monthJnls=jnls.filter(function(j){return j.date&&j.date.startsWith(thisMonth);});
+
+  // Count per type
+  var counts={water:0,fert:0,'ganti pot':0,note:0,disease:0,prune:0};
+  monthJnls.forEach(function(j){if(counts[j.type]!==undefined)counts[j.type]++;else counts.note++;});
+  var total=monthJnls.length;
+
+  // ── Stats Grid ──
+  var grid=document.getElementById('statsGrid');
+  if(grid){
+    grid.innerHTML=
+      '<div class="sg-card"><div class="sg-ico">💧</div><div class="sg-num">'+counts.water+'</div><div class="sg-lbl">Siram</div></div>'+
+      '<div class="sg-card"><div class="sg-ico">🌱</div><div class="sg-num">'+counts.fert+'</div><div class="sg-lbl">Pupuk</div></div>'+
+      '<div class="sg-card"><div class="sg-ico">✂️</div><div class="sg-num">'+counts.prune+'</div><div class="sg-lbl">Pangkas</div></div>'+
+      '<div class="sg-card"><div class="sg-ico">🪴</div><div class="sg-num">'+counts['ganti pot']+'</div><div class="sg-lbl">Ganti Pot</div></div>'+
+      '<div class="sg-card"><div class="sg-ico">🩺</div><div class="sg-num">'+counts.disease+'</div><div class="sg-lbl">Penyakit</div></div>'+
+      '<div class="sg-card"><div class="sg-ico">📝</div><div class="sg-num">'+counts.note+'</div><div class="sg-lbl">Catatan</div></div>';
+  }
+
+  // ── Bar Chart ──
+  var chart=document.getElementById('statsChart');
+  if(chart){
+    var maxVal=Math.max(1,counts.water,counts.fert,counts.prune,counts['ganti pot'],counts.disease,counts.note);
+    var rows=[
+      {ico:'💧',lbl:'Siram',val:counts.water,clr:JCOLORS.water},
+      {ico:'🌱',lbl:'Pupuk',val:counts.fert,clr:JCOLORS.fert},
+      {ico:'✂️',lbl:'Pangkas',val:counts.prune,clr:JCOLORS.prune},
+      {ico:'🪴',lbl:'Ganti Pot',val:counts['ganti pot'],clr:JCOLORS['ganti pot']},
+      {ico:'🩺',lbl:'Penyakit',val:counts.disease,clr:JCOLORS.disease},
+      {ico:'📝',lbl:'Catatan',val:counts.note,clr:JCOLORS.note},
+    ];
+    chart.innerHTML=rows.map(function(r){
+      var pct=Math.round(r.val/maxVal*100);
+      return'<div class="chart-row">'
+        +'<div class="chart-lbl">'+r.ico+' '+r.lbl+'</div>'
+        +'<div class="chart-bar-wrap"><div class="chart-bar" style="width:'+pct+'%;background:'+r.clr+'"></div></div>'
+        +'<div class="chart-val">'+r.val+'</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // ── Streak ──
+  var streak=0;var d=new Date();
+  for(var i=0;i<365;i++){
+    var ds=d.toISOString().split('T')[0];
+    if(jnls.some(function(j){return j.date===ds;})){streak++;}
+    else if(i>0){break;}
+    d.setDate(d.getDate()-1);
+  }
+  var streakEl=document.getElementById('statsStreak');
+  if(streakEl){
+    streakEl.innerHTML='<div class="streak-card">'
+      +'<div class="streak-num">'+streak+'🔥</div>'
+      +'<div class="streak-info"><div class="streak-title">Hari Berturut-turut</div>'
+      +'<div class="streak-sub">'+(streak>0?'Keren! Terus jaga konsistensimu!':'Mulai merawat hari ini!')+'</div></div>'
+      +'</div>';
+  }
+
+  // ── Log semua aktivitas ──
+  var logEl=document.getElementById('statsLog');
+  if(logEl){
+    var sorted=jnls.slice().sort(function(a,b){return new Date(b.date)-new Date(a.date);}).slice(0,20);
+    if(!sorted.length){logEl.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Belum ada aktivitas</div>';return;}
+    logEl.innerHTML=sorted.map(function(j){
+      var p=plants.find(function(x){return x.id===j.plantId;});
+      var pName=p?p.name:'(dihapus)';
+      var pIco=p?(p.emoji||typeEmoji(p.type)||'🌿'):'🌿';
+      var clr=JCOLORS[j.type]||JCOLORS.note;
+      return'<div class="slog-item">'
+        +'<div class="slog-ico" style="background:'+clr+'22">'+( JICO[j.type]||'📝')+'</div>'
+        +'<div><div class="slog-name">'+pName+' '+pIco+'</div>'
+        +'<div class="slog-type">'+(j.note||JLBL[j.type]||j.type)+'</div></div>'
+        +'<div class="slog-date">'+fmtD(j.date)+'</div>'
+        +'</div>';
+    }).join('');
+  }
+}
+
+// ════ RIWAYAT SCAN DI JURNAL ════
+function renderScanHistJnl(){
+  var el=document.getElementById('scanHistJnl');if(!el)return;
+  var hist=JSON.parse(localStorage.getItem('bq_scan_hist_'+CU)||'[]');
+  if(!hist.length){
+    el.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px">Belum ada riwayat scan.<br>Coba tab Scan untuk identifikasi tanaman!</div>';
+    return;
+  }
+  el.innerHTML=hist.map(function(h,i){
+    return'<div style="background:var(--white);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +(h.img?'<img src="'+h.img+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0">':'<div style="width:44px;height:44px;border-radius:10px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🌿</div>')
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+h.name+'</div>'
+      +'<div style="font-size:11px;font-style:italic;color:var(--text-muted);margin-bottom:2px">'+( h.sci||'')+'</div>'
+      +'<div style="font-size:11px;color:var(--text-muted)">'+h.score+'% · '+fmtD(h.date)+'</div>'
+      +'</div></div>'
+      +'<div style="display:flex;gap:8px;margin-top:10px">'
+      +'<button class="pn-add-btn" data-nm="'+h.name+'" data-sci="'+(h.sci||'')+'" style="flex:1;padding:7px;border-radius:10px;border:none;background:var(--green-pale);color:var(--green-mid);font-size:12px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif">＋ Tambah ke Koleksi</button>'
+      +'<button onclick="delScanHist('+i+')" style="padding:7px 12px;border-radius:10px;border:none;background:var(--rlt);color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif">🗑️</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function delScanHist(idx){
+  if(!confirm('Hapus riwayat scan ini?'))return;
+  var hist=JSON.parse(localStorage.getItem('bq_scan_hist_'+CU)||'[]');
+  hist.splice(idx,1);
+  localStorage.setItem('bq_scan_hist_'+CU,JSON.stringify(hist));
+  renderScanHistJnl();
+  renderScanHist();
+  toast('🗑️ Dihapus');
+}
 
 // ════ INIT ════
 var savedUser=lsRaw('bq_user');
