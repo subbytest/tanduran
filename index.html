@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>BotanIQ - Rawat Tanaman Lebih Cerdas</title>
+<title>Botaniq - Plant Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -23,17 +23,17 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 #app{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.18)}
 
 /* LOGIN */
-#login{position:absolute;inset:0;z-index:200;background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem}
+#login{position:absolute;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem}
 #login.off{display:none}
 .ll{font-size:4rem;margin-bottom:1rem}
-.llogo{font-family:'Playfair Display',serif;font-size:2.4rem;margin-bottom:.25rem;color:var(--text)}
+.llogo{font-family:'Playfair Display',serif;font-size:2.6rem;margin-bottom:.25rem;color:var(--green-dark)}
 .llogo em{font-style:italic;color:var(--green-light)}
 .lsub{font-size:.75rem;color:var(--text-muted);margin-bottom:2rem;text-align:center;line-height:1.6}
-.lbox{width:100%;max-width:320px}
+.lbox{width:100%;max-width:320px;background:var(--white);border-radius:20px;padding:1.5rem;border:1.5px solid var(--line);box-shadow:0 4px 24px rgba(26,77,46,.08)}
 .llbl{font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.35rem;display:block}
 .linp{width:100%;padding:.75rem 1rem;border:1.5px solid var(--line);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--bg2);outline:none;transition:.2s;margin-bottom:.55rem}
 .linp:focus{border-color:var(--green-mid);background:var(--white)}
-.lbtn{width:100%;padding:.82rem;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green-mid),var(--green-dark));color:#fff;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(26,77,46,.3)}
+.lbtn{width:100%;padding:.9rem;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green-mid),var(--green-dark));color:#fff;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(26,77,46,.3);display:flex;align-items:center;justify-content:center;gap:8px}
 .lnote{font-size:.62rem;color:var(--text-muted);text-align:center;margin-top:.75rem;line-height:1.65}
 .lnote strong{color:var(--green-mid)}
 
@@ -389,8 +389,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
   <div class="lsub">Aplikasi cerdas untuk merawat<br>tanaman koleksimu</div>
   <div class="lbox">
     <label class="llbl">Username kamu</label>
-    <input class="linp" id="linp" type="text" placeholder="Contoh: Petani01, Kebun123" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="lbtn" onclick="doLogin()">Masuk ke BotanIQ →</button>
+    <input class="linp" id="linp" type="text" placeholder="Contoh: Petani666, Kebun01" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Masuk ke Botaniq</button>
     <div class="lnote"><strong>Username = kunci data kamu.</strong><br>Gunakan username yang sama di perangkat lain untuk sinkronisasi data cloud.</div>
   </div>
 </div>
@@ -680,7 +680,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
 <script>
 // ════ CONFIG ════
-var GKEY='AIzaSyCmXdw8jDL6c9y5v7WFWbNPZLI5tk-0D_M';
+var GKEY='AIzaSyBBwy-i8utkUaqH6SlnfNTOI4tksX-bMfc';
 var GURL='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GKEY;
 var SBURL='https://atinplsrmgkcgsdwvhiw.supabase.co';
 var SBKEY='sb_publishable__s0F7wR6_cJElrsrg9NjrA_R1NTzhWW';
@@ -907,7 +907,7 @@ function editPlant(id){var p=plants.find(function(x){return x.id===id;});if(!p)r
 
 // ════ MANAGE TYPES ════
 function openManageTypes(){var ex=document.getElementById('mgtmodal');if(ex)ex.remove();var modal=document.createElement('div');modal.id='mgtmodal';modal.className='mgt-modal';var inner=document.createElement('div');inner.className='mgt-inner';inner.id='mgtinner';modal.appendChild(inner);document.getElementById('app').appendChild(modal);modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});renderManageTypes();}
-function renderManageTypes(){var inner=document.getElementById('mgtinner');if(!inner)return;var types=getTypes();var rows=types.map(function(t){var isD=DEFAULT_TYPES.some(function(d){return d.id===t.id;});var btn=isD?'<span style="font-size:11px;color:var(--text-muted)">default</span>':'<button onclick="deleteType(\''+t.id+'\')" style="background:#FDE8E8;color:#D94040;border:1px solid #ECC4C4;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif">Hapus</button>';return'<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:12px;margin-bottom:6px;border:1px solid var(--line)"><span style="font-size:1.1rem">'+t.emoji+'</span><span style="flex:1;font-size:13px;font-weight:500;color:var(--text)">'+t.label+'</span>'+btn+'</div>';}).join('');inner.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><button onclick="document.getElementById(\'mgtmodal\').remove()" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">←</button><div style="font-family:\'Playfair Display\',serif;font-size:20px;color:var(--green-dark)">Kelola Jenis Tanaman</div></div><div style="margin-bottom:14px">'+rows+'</div><div style="display:flex;gap:8px;padding:10px;background:var(--bg2);border-radius:14px;border:1.5px solid var(--line)"><input id="ntemoji" value="🌱" style="width:48px;text-align:center;padding:9px 4px;border:1.5px solid var(--line);border-radius:10px;font-size:18px;background:#fff;outline:none"><input id="ntname" placeholder="Nama jenis (mis. Bugenvile)" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:13px;background:#fff;outline:none;color:var(--text)"><button onclick="addNewType()" style="background:var(--green-mid);color:#fff;border:none;padding:9px 14px;border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">+ Tambah</button></div>';}
+function renderManageTypes(){var inner=document.getElementById('mgtinner');if(!inner)return;var types=getTypes();var rows=types.map(function(t){var btn='<button onclick="deleteType(\''+t.id+'\')" style="background:#FDE8E8;color:#D94040;border:1px solid #ECC4C4;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif">Hapus</button>';return'<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:12px;margin-bottom:6px;border:1px solid var(--line)"><span style="font-size:1.1rem">'+t.emoji+'</span><span style="flex:1;font-size:13px;font-weight:500;color:var(--text)">'+t.label+'</span>'+btn+'</div>';}).join('');inner.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><button onclick="document.getElementById(\'mgtmodal\').remove()" style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">←</button><div style="font-family:\'Playfair Display\',serif;font-size:20px;color:var(--green-dark)">Kelola Jenis Tanaman</div></div><div style="margin-bottom:14px">'+rows+'</div><div style="display:flex;gap:8px;padding:10px;background:var(--bg2);border-radius:14px;border:1.5px solid var(--line)"><input id="ntemoji" value="🌱" style="width:48px;text-align:center;padding:9px 4px;border:1.5px solid var(--line);border-radius:10px;font-size:18px;background:#fff;outline:none"><input id="ntname" placeholder="Nama jenis (mis. Bugenvile)" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:13px;background:#fff;outline:none;color:var(--text)"><button onclick="addNewType()" style="background:var(--green-mid);color:#fff;border:none;padding:9px 14px;border-radius:10px;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">+ Tambah</button></div>';}
 function addNewType(){var emoji=(document.getElementById('ntemoji').value||'🌱').trim();var name=(document.getElementById('ntname').value||'').trim();if(!name){toast('Isi nama jenis dulu!');return;}var types=getTypes();var id=name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');if(types.find(function(t){return t.id===id;})){toast('Jenis sudah ada!');return;}types.push({id:id,label:name,emoji:emoji});saveTypes(types);populateTypeSelect();renderManageTypes();toast('✅ '+name+' ditambahkan!');}
 function deleteType(id){if(plants.find(function(p){return p.type===id;})){toast('⚠️ Ada tanaman dengan jenis ini!');return;}var types=getTypes().filter(function(t){return t.id!==id;});saveTypes(types);populateTypeSelect();renderManageTypes();toast('🗑️ Jenis dihapus');}
 
@@ -951,7 +951,7 @@ async function doAIScan(mode){
     :'Kamu adalah ahli penyakit tanaman. Analisa kondisi tanaman dalam gambar ini. Jawab dalam Bahasa Indonesia dengan format JSON tepat (tanpa markdown/backtick):\n{"plantName":"nama tanaman","emoji":"emoji","health":"good/warn/bad","issues":[{"name":"nama masalah","severity":"ringan/sedang/parah","solution":"solusi singkat"}],"tips":["tip1","tip2"],"confidence":90}';
 
   try{
-    var visionUrl='https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+GKEY;
+    var visionUrl='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GKEY;
     var visionRes=await fetch(visionUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{inline_data:{mime_type:mtype,data:b64}},{text:prompt}]}],generationConfig:{temperature:.3,maxOutputTokens:800}})});
     if(!visionRes.ok){var ej={};try{ej=await visionRes.json();}catch(e2){}throw new Error('HTTP '+visionRes.status+': '+(ej.error?ej.error.message:'Gagal'));}
     var data=await visionRes.json();
