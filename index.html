@@ -1413,7 +1413,7 @@ if(savedUser){CU=savedUser;document.getElementById('login').classList.add('off')
 else{document.getElementById('syncbar').style.display='none';}
 
 // ════ TANYA AI (GEMINI) ════
-var GEMINI_KEY='AIzaSyBfweo5i6H_uk55NaOxWsUj_JIzseRA7B0';
+var GEMINI_KEY='AIzaSyDc6hu5ET1te3zDXM7a6Mc-sR1otuI7Cm8';
 var GEMINI_URL='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=';
 var aiHistory=[];var aiInited=false;
 
@@ -1438,7 +1438,7 @@ async function sendAiMsg(){
   te.className='ai-typing';te.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
   msgs.appendChild(te);var sc=document.getElementById('aiScroll');if(sc)sc.scrollTop=sc.scrollHeight;
   try{
-    if(GEMINI_KEY==='AIzaSyBfweo5i6H_uk55NaOxWsUj_JIzseRA7B0'){
+    if(GEMINI_KEY==='AIzaSyDc6hu5ET1te3zDXM7a6Mc-sR1otuI7Cm8'){
       te.remove();appendAiMsg('⚠️ Isi GEMINI_KEY di kode dulu ya!','ai-bot');
       if(btn)btn.disabled=false;return;
     }
