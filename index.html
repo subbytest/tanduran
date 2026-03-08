@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Botaniq - Plant Intelligence</title>
+<title>Botaniq</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -290,13 +290,13 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
 /* DETAIL PANEL */
 .detail{position:absolute;inset:0;z-index:50;background:var(--white);display:flex;flex-direction:column;overflow:hidden;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);pointer-events:none}
-.detail.open{transform:translateX(0);pointer-events:all}
+.detail.open{transform:translateX(0);z-index:150;pointer-events:all}
 .dback{position:absolute;top:14px;left:14px;z-index:5;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--line);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);box-shadow:var(--shadow)}
 .d-img{height:200px;background:#1a4d2e;display:flex;align-items:center;justify-content:center;font-size:72px;flex-shrink:0;overflow:hidden;position:relative}
 .d-img img{width:100%;height:100%;object-fit:contain;position:relative;z-index:1;padding:8px;filter:drop-shadow(0 4px 16px rgba(0,0,0,.25))}
 .d-img .d-blur-bg{position:absolute;inset:-10px;background-size:cover;background-position:center;filter:blur(18px) brightness(.55);transform:scale(1.1);z-index:0}
 .d-emoji{position:relative;z-index:1}
-.d-body{flex:1;overflow-y:auto;padding:16px 20px;scrollbar-width:none}
+.d-body{flex:1;overflow-y:auto;padding:16px 20px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .d-body::-webkit-scrollbar{display:none}
 .d-name{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:6px}
 .d-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -427,10 +427,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 .gear-filt.on{background:var(--green-pale);color:var(--green-mid);font-weight:700}
 
 /* ── AI CHAT ── */
-.ai-msg{max-width:86%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.65;word-break:break-word;animation:msgIn .18s ease}
+.ai-msg{max-width:82%;padding:11px 15px;border-radius:18px;font-size:13.5px;line-height:1.55;word-break:break-word}
 @keyframes msgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.ai-user{background:var(--green-dark);color:#fff;border-radius:16px 16px 4px 16px;align-self:flex-end;margin-left:auto}
-.ai-bot{background:var(--white);color:var(--text);border-radius:16px 16px 16px 4px;align-self:flex-start;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ai-user{background:linear-gradient(135deg,var(--green-light),var(--green-dark));color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.ai-bot{background:var(--white);color:var(--text);border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .ai-typing{display:flex;gap:4px;align-items:center;padding:10px 14px;background:var(--white);border-radius:16px 16px 16px 4px;align-self:flex-start;border:1px solid var(--line)}
 .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green-light);animation:dtb .8s infinite}
 .dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
@@ -569,23 +569,23 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
 <!-- AI TIPS -->
 <div class="scr" id="scr-stats">
-  <div style="padding:14px 20px 8px;flex-shrink:0;border-bottom:1px solid var(--line)">
+  <div style="padding:14px 20px 10px;flex-shrink:0;border-bottom:1px solid var(--line)">
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--green-dark)">✨ Tanya AI</div>
   </div>
-  <div style="padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid var(--line)">
+  <div style="padding:8px 16px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0">
     <button class="cchip" onclick="setAiChip('Cara merawat kaktus')">🌵 Kaktus</button>
     <button class="cchip" onclick="setAiChip('Daun menguning kenapa?')">🍂 Daun Kuning</button>
     <button class="cchip" onclick="setAiChip('Cara basmi hama tanaman')">🐛 Hama</button>
     <button class="cchip" onclick="setAiChip('Tips repotting tanaman')">🪴 Repotting</button>
     <button class="cchip" onclick="setAiChip('Jadwal penyiraman yang baik')">💧 Siram</button>
   </div>
-  <div id="aiScroll" style="flex:1;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column">
-    <div style="flex:1"></div>
-    <div id="aiMessages" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
+  <div id="aiScroll" style="flex:1;overflow-y:auto;scrollbar-width:none;min-height:0;display:flex;flex-direction:column">
+    <div style="flex:1;min-height:16px"></div>
+    <div id="aiMessages" style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px"></div>
   </div>
-  <div style="padding:10px 16px 14px;display:flex;gap:8px;align-items:center;flex-shrink:0;border-top:1px solid var(--line);background:var(--white)">
-    <input id="aiInput" type="text" placeholder="Tanya tentang tanamanmu..." style="flex:1;padding:11px 16px;border:1.5px solid var(--line);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg2);outline:none;color:var(--text)" onkeydown="if(event.key==='Enter')sendAiMsg()">
-    <button id="aiSendBtn" onclick="sendAiMsg()" style="width:40px;height:40px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--green-light),var(--green-dark));border:none;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(26,77,46,.35)">➤</button>
+  <div style="padding:10px 16px 16px;display:flex;gap:10px;align-items:center;flex-shrink:0;border-top:1px solid var(--line);background:var(--white)">
+    <input id="aiInput" type="text" placeholder="Tanya tentang tanamanmu..." style="flex:1;padding:12px 18px;border:1.5px solid var(--line);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg2);outline:none;color:var(--text);-webkit-appearance:none" onkeydown="if(event.key==='Enter')sendAiMsg()">
+    <button onclick="sendAiMsg()" id="aiSendBtn" style="width:44px;height:44px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--green-light),var(--green-dark));border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,77,46,.3)">➤</button>
   </div>
 </div>
 <div class="scr" id="scr-journal">
@@ -782,7 +782,6 @@ var SBURL='https://atinplsrmgkcgsdwvhiw.supabase.co';
 var SBKEY='sb_publishable__s0F7wR6_cJElrsrg9NjrA_R1NTzhWW';
 
 // ════ SUPABASE ════
-// ════ SUPABASE ════
 async function sbQ(table,method,body,params){
   var url=SBURL+'/rest/v1/'+table+(params?'?'+params:'');
   var h={'apikey':SBKEY,'Authorization':'Bearer '+SBKEY,'Content-Type':'application/json','Prefer':'return=representation'};
@@ -865,8 +864,8 @@ function showAccountMenu(){
 async function loadData(){
   try{
     var enc=encodeURIComponent(CU);
-    var results=await Promise.all([sbQ('bq_plants','GET',null,'username=eq.'+enc+'&order=created_at.asc'),sbQ('bq_jnls','GET',null,'username=eq.'+enc+'&order=date.desc'),sbQ('bq_scans','GET',null,'username=eq.'+enc+'&order=created_at.desc&limit=50')]);
-    var sbP=results[0],sbJ=results[1],sbS=results[2];
+    var results=await Promise.all([sbQ('bq_plants','GET',null,'username=eq.'+enc+'&order=created_at.asc'),sbQ('bq_jnls','GET',null,'username=eq.'+enc+'&order=date.desc'),sbQ('bq_scans','GET',null,'username=eq.'+enc+'&order=created_at.desc&limit=50'),sbQ('bq_photos','GET',null,'username=eq.'+enc+'&order=date.desc')]);
+    var sbP=results[0],sbJ=results[1],sbS=results[2],sbPh=results[3];
     if(sbP!==null){plants=sbP.map(function(r){return{id:parseInt(r.id),name:r.name,type:r.type,emoji:r.emoji,image:r.image,water:r.water,fert:r.fert,lastWater:r.last_water,lastFert:r.last_fert,health:r.health,notes:r.notes,added:r.added};});pid=plants.length?Math.max.apply(null,plants.map(function(p){return p.id;}))+1:1;setSyncStatus('ok','☁️ Data tersinkron');}
     else{plants=lsGet('bq_p_'+CU,[]);setSyncStatus('err','⚠️ Offline — data lokal');}
     if(sbJ!==null){jnls=sbJ.map(function(r){return{id:parseInt(r.id),plantId:parseInt(r.plant_id),type:r.type,note:r.note,date:r.date};});jid=jnls.length?Math.max.apply(null,jnls.map(function(j){return j.id;}))+1:1;}else{jnls=lsGet('bq_j_'+CU,[]);}
@@ -879,18 +878,13 @@ async function loadData(){
       if(pnScans.length)saveScanHist(pnScans);
     }else{scans=lsGet('bq_s_'+CU,[]);}
   }catch(e){plants=lsGet('bq_p_'+CU,[]);jnls=lsGet('bq_j_'+CU,[]);scans=lsGet('bq_s_'+CU,[]);setSyncStatus('err','⚠️ Gagal terhubung');saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();}
-  // Load photos for all plants into fpCache
-  if(plants.length){
-    var plantIds=plants.map(function(p){return p.id;}).join(',');
-    sbQ('bq_photos','GET',null,'username=eq.'+encodeURIComponent(CU)+'&order=date.desc').then(function(photos){
-      if(photos&&photos.length){
-        fpCache={};
-        photos.forEach(function(ph){
-          var pid=parseInt(ph.plant_id);
-          if(!fpCache[pid])fpCache[pid]=[];
-          fpCache[pid].push({id:ph.id,img:ph.image,date:ph.date});
-        });
-      }
+  // Load photos into fpCache (sudah paralel di Promise.all)
+  if(sbPh&&sbPh.length){
+    fpCache={};
+    sbPh.forEach(function(ph){
+      var pid=parseInt(ph.plant_id);
+      if(!fpCache[pid])fpCache[pid]=[];
+      fpCache[pid].push({id:ph.id,img:ph.image,date:ph.date});
     });
   }
   saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();
@@ -1137,13 +1131,6 @@ function quickLog(plantId){
 // ════ FOTO PROGRESS ════
 var fpCache={};
 
-async function loadFP(plantId){
-  if(fpCache[plantId])return fpCache[plantId];
-  var res=await sbQ('bq_photos','GET',null,'plant_id=eq.'+plantId+'&username=eq.'+encodeURIComponent(CU)+'&order=date.desc');
-  var photos=(res||[]).map(function(r){return{id:r.id,img:r.image,date:r.date};});
-  fpCache[plantId]=photos;
-  return photos;
-}
 
 async function renderFP(plantId){
   var el=document.getElementById('fpgrid-'+plantId);if(!el)return;
@@ -1372,7 +1359,11 @@ function renderStats(){
     {ico:'📝',lbl:'Catatan',val:c.note,clr:'#7B4FB5'}
   ];
   el.innerHTML=
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">'
+    '<div class="streak-card" style="margin-bottom:14px">'
+    +'<div class="streak-num">'+streak+'🔥</div>'
+    +'<div class="streak-info"><div class="streak-title">Hari Berturut-turut</div>'
+    +'<div class="streak-sub">'+(streak>0?'Keren! Terus konsisten!':'Mulai merawat hari ini!')+'</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">'
     +'<div class="sg-card"><div class="sg-ico">💧</div><div class="sg-num">'+c.water+'</div><div class="sg-lbl">Siram</div></div>'
     +'<div class="sg-card"><div class="sg-ico">🌱</div><div class="sg-num">'+c.fert+'</div><div class="sg-lbl">Pupuk</div></div>'
     +'<div class="sg-card"><div class="sg-ico">✂️</div><div class="sg-num">'+c.prune+'</div><div class="sg-lbl">Pangkas</div></div>'
@@ -1380,10 +1371,6 @@ function renderStats(){
     +'<div class="sg-card"><div class="sg-ico">🤒</div><div class="sg-num">'+c.disease+'</div><div class="sg-lbl">Penyakit</div></div>'
     +'<div class="sg-card"><div class="sg-ico">📝</div><div class="sg-num">'+c.note+'</div><div class="sg-lbl">Catatan</div></div>'
     +'</div>'
-    +'<div class="streak-card" style="margin-bottom:14px">'
-    +'<div class="streak-num">'+streak+'🔥</div>'
-    +'<div class="streak-info"><div class="streak-title">Hari Berturut-turut</div>'
-    +'<div class="streak-sub">'+(streak>0?'Keren! Terus konsisten!':'Mulai merawat hari ini!')+'</div></div></div>'
     +'<div class="d-sec-title" style="margin-bottom:10px">Aktivitas Bulan Ini</div>'
     +bars.map(function(r){
       var pct=Math.round(r.val/maxVal*100);
@@ -1484,7 +1471,7 @@ function initAiScreen(){
 async function sendAiMsg(){
   var inp=document.getElementById('aiInput');
   var text=(inp.value||'').trim();if(!text)return;
-  inp.value='';inp.style.height='auto';
+  inp.value='';
   var btn=document.getElementById('aiSendBtn');if(btn)btn.disabled=true;
   appendAiMsg(text,'ai-user');
   aiHistory.push({role:'user',parts:[{text:text}]});
@@ -1521,7 +1508,7 @@ function appendAiMsg(text,cls){
   el.innerHTML=text.replace(/\n/g,'<br>');
   msgs.appendChild(el);
   var sc=document.getElementById('aiScroll');
-  if(sc)sc.scrollTop=sc.scrollHeight;
+  if(sc)setTimeout(function(){sc.scrollTop=sc.scrollHeight;},50);
 }
 
 function setAiChip(text){
