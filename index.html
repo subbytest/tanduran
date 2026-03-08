@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Botaniq</title>
+<title>Botaniq - Plant Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -468,7 +468,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
   <div class="lsub">Plant care, <em>Digitalized!</em></div>
   <div class="lbox">
     <label class="llbl">Username kamu</label>
-    <input class="linp" id="linp" type="text" placeholder="Contoh: Petani666, Kebun01" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')doLogin()">
+    <input class="linp" id="linp" type="text" placeholder="Contoh: alan, kebun01, petani" autocomplete="username" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="lbtn" onclick="doLogin()">Masuk ke Botaniq</button>
     <div class="lnote"><strong>Username = kunci data kamu.</strong><br>Pakai username yang sama di HP lain untuk sync otomatis ☁️</div>
   </div>
@@ -825,9 +825,14 @@ function setSyncStatus(cls,msg){var b=document.getElementById('syncbar');b.style
 // ════ LOGIN ════
 function doLogin(){
   var raw=document.getElementById('linp').value.trim();
-  if(!raw||raw.length<2){toast('Username minimal 2 karakter!');return;}
-  CU=raw.toLowerCase().replace(/[^a-z0-9_]/g,'').replace(/\s+/g,'_');
-  if(!CU||CU.length<2){toast('Username hanya huruf, angka, dan underscore!');return;}
+  if(!raw){toast('Isi username dulu!');return;}
+  // Toleran: ubah spasi jadi underscore, hapus karakter aneh
+  CU=raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  if(!CU||CU.length<2){
+    // Fallback: pakai raw langsung (hash sederhana)
+    CU=raw.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20);
+  }
+  if(!CU){CU='user'+Date.now().toString().slice(-6);}
   lsRawSet('bq_user',CU);
   document.getElementById('login').classList.add('off');
   document.getElementById('ulabel').textContent=CU;
@@ -1600,11 +1605,9 @@ function selectManualEmoji(btn,emoji){
   document.querySelectorAll('.emoji-opt').forEach(function(b){
     b.style.background='var(--bg2)';b.style.borderColor='var(--line)';
   });
-  btn.style.background='var(--green-pale)';btn.style.borderColor='
-  (--green-mid)';
+  btn.style.background='var(--green-pale)';btn.style.borderColor='var(--green-mid)';
   document.getElementById('manual-emoji-sel').textContent=emoji;
 }
 </script>
 </body>
 </html>
-
