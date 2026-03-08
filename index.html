@@ -601,6 +601,34 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
   <div id="jtl-stats" style="display:none;padding:0 20px 20px"></div>
 </div>
 
+
+<!-- FOTO PROGRESS SHEET -->
+<div class="sheet" id="fpsheet">
+  <div class="sheet-bar"></div>
+  <div class="sheet-title">📸 Tambah Foto Progress</div>
+  <input type="hidden" id="fpPlantId">
+  <div class="fg">
+    <label class="fl">Tanggal</label>
+    <input type="date" id="fpDate" class="fi">
+  </div>
+  <div class="fg">
+    <label class="fl">Foto</label>
+    <div class="img-upload" onclick="document.getElementById('fpImgInput').click()" style="height:160px;border-radius:14px;border:2px dashed var(--line);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden">
+      <img id="fpPrev" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px">
+      <div id="fpIcoEl" style="font-size:32px">📷</div>
+      <div id="fpTxtEl" style="font-size:12px;color:var(--text-muted);margin-top:4px">Pilih foto</div>
+    </div>
+    <input type="file" id="fpImgInput" accept="image/*" style="display:none" onchange="onFpImg(event)">
+  </div>
+  <button class="submt" onclick="saveFP()">💾 Simpan Foto</button>
+</div>
+
+<!-- FP LIGHTBOX -->
+<div id="fpLightbox" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.85);z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+  <button onclick="closeFpLightbox()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:20px;width:36px;height:36px;border-radius:50%;cursor:pointer">✕</button>
+  <img id="fpLbImg" src="" style="max-width:100%;max-height:80%;border-radius:12px;object-fit:contain">
+  <div id="fpLbDate" style="color:rgba(255,255,255,.7);font-size:12px;margin-top:10px"></div>
+</div>
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <button class="nav-item active" id="nav-home" onclick="showScr('home')">
@@ -629,7 +657,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 </div>
 
 <!-- CHOOSE MODE OVERLAY -->
-</div>
+<div class="overlay" id="chooseOv">
+  <div class="sheet">
+    <div class="sheet-bar"></div>
+    <div class="sheet-title">Pilih Mode Scan</div>
     <div class="choose-cards">
       <div class="choose-card id" onclick="closeSheet('chooseOv');doAIScan('id')">
         <span class="cc-ico">🔍</span>
@@ -647,8 +678,6 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 </div>
 
 <!-- SCAN RESULT SHEET -->
-<div id="resultSheetBody"></div>
-</div>
 
 <!-- PLANT SHEET -->
 <div class="overlay" id="psheet" onclick="if(event.target===this){stopPlantCam();closeSheet('psheet')}">
@@ -683,6 +712,23 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
       <label class="fl">Jenis</label>
       <select class="fsel" id="pftype" onchange="onTypeChange()"></select>
       <input class="fi" id="pftype-manual" placeholder="Tulis jenis tanaman..." style="display:none;margin-top:8px">
+      <div id="manual-emoji-wrap" style="display:none;margin-top:8px">
+        <label class="fl">Emoji Tanaman</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+          <button id="manual-emoji-sel" class="emoji-opt" onclick="selectManualEmoji(this,'🌿')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌿</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌱')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌱</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌸')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌸</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌺')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌺</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌻')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌻</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌼')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌼</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🍀')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🍀</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌵')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌵</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🎋')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🎋</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🎍')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🎍</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🪴')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🪴</button>
+          <button class="emoji-opt" onclick="selectManualEmoji(this,'🌳')" style="font-size:20px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);cursor:pointer">🌳</button>
+        </div>
+      </div>
       <button onclick="openManageTypes()" style="background:none;border:none;color:var(--green-mid);font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;padding:4px 0;text-align:left">+ Kelola Jenis</button>
     </div>
     <div class="frow">
@@ -722,7 +768,13 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
 <script>
 // ════ CONFIG ════
-var PLANTNET_KEY='2b10ShZUffdot9X2b07gtOu2e'; // ← ganti dengan API key Pl@ntNet kamu
+// ============================================================
+// 🌿 API KEY 1: Pl@ntNet (untuk fitur Scan / Identifikasi Tanaman)
+// Daftar gratis di: https://my.plantnet.org/
+// Setelah login → klik nama kamu → "My profile" → salin API key
+// Contoh: var PLANTNET_KEY='2b3xXXXXXXXXXXXXXXXXXXXX';
+// ============================================================
+var PLANTNET_KEY='2b3xAbCdEfGhIjKl';
 
 var SBURL='https://atinplsrmgkcgsdwvhiw.supabase.co';
 var SBKEY='sb_publishable__s0F7wR6_cJElrsrg9NjrA_R1NTzhWW';
@@ -772,11 +824,13 @@ function setSyncStatus(cls,msg){var b=document.getElementById('syncbar');b.style
 function doLogin(){
   var raw=document.getElementById('linp').value.trim();
   if(!raw||raw.length<2){toast('Username minimal 2 karakter!');return;}
-  CU=raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  CU=raw.toLowerCase().replace(/[^a-z0-9_]/g,'').replace(/\s+/g,'_');
+  if(!CU||CU.length<2){toast('Username hanya huruf, angka, dan underscore!');return;}
   lsRawSet('bq_user',CU);
   document.getElementById('login').classList.add('off');
   document.getElementById('ulabel').textContent=CU;
   document.getElementById('hgreet').textContent='Halo, '+CU+'! 👋';
+  showScr('home');
   setSyncStatus('sync','Memuat data...');
   loadData();
 }
@@ -817,7 +871,21 @@ async function loadData(){
       });
       if(pnScans.length)saveScanHist(pnScans);
     }else{scans=lsGet('bq_s_'+CU,[]);}
-  }catch(e){plants=lsGet('bq_p_'+CU,[]);jnls=lsGet('bq_j_'+CU,[]);scans=lsGet('bq_s_'+CU,[]);setSyncStatus('err','⚠️ Gagal terhubung');}
+  }catch(e){plants=lsGet('bq_p_'+CU,[]);jnls=lsGet('bq_j_'+CU,[]);scans=lsGet('bq_s_'+CU,[]);setSyncStatus('err','⚠️ Gagal terhubung');saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();}
+  // Load photos for all plants into fpCache
+  if(plants.length){
+    var plantIds=plants.map(function(p){return p.id;}).join(',');
+    sbQ('bq_photos','GET',null,'username=eq.'+encodeURIComponent(CU)+'&order=date.desc').then(function(photos){
+      if(photos&&photos.length){
+        fpCache={};
+        photos.forEach(function(ph){
+          var pid=parseInt(ph.plant_id);
+          if(!fpCache[pid])fpCache[pid]=[];
+          fpCache[pid].push({id:ph.id,img:ph.image,date:ph.date});
+        });
+      }
+    });
+  }
   saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();
   setTimeout(function(){document.getElementById('syncbar').style.display='none';},2000);
 }
@@ -832,7 +900,7 @@ function showScr(n){
   var b=document.getElementById('nav-'+n);if(b)b.classList.add('active');
   if(n==='home')renderHome();if(n==='plants')renderPlants();
   if(n==='journal'){renderJnl();}
-  if(n==='tips');if(n==='scan')renderScanRow();
+  if(n==='scan')renderScanRow();
 }
 function openSheet(id){
   if(id==='psheet'&&!document.getElementById('pfid').value){
@@ -953,7 +1021,7 @@ async function startPlantCam(){try{pfCamStream=await navigator.mediaDevices.getU
 function stopPlantCam(){if(pfCamStream){pfCamStream.getTracks().forEach(function(t){t.stop();});pfCamStream=null;}}
 function snapPlantCam(){var v=document.getElementById('pfvid'),c=document.getElementById('pfcvs');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);addImg=c.toDataURL('image/jpeg',.85);stopPlantCam();setPfTab('file',document.getElementById('pft-file'));var prev=document.getElementById('pfprev');prev.src=addImg;prev.style.display='block';document.querySelector('#psheet .iuico').style.display='none';document.querySelector('#psheet .iutxt').style.display='none';toast('📸 Foto diambil!');}
 function populateTypeSelect(){var sel=document.getElementById('pftype');if(!sel)return;var cur=sel.value;sel.innerHTML=getTypes().map(function(t){return'<option value="'+t.id+'">'+t.emoji+' '+t.label+'</option>';}).join('');if(cur)sel.value=cur;}
-function onTypeChange(){var sel=document.getElementById('pftype'),m=document.getElementById('pftype-manual');if(sel.value==='lainnya'){m.style.display='block';m.focus();}else{m.style.display='none';m.value='';}}
+function onTypeChange(){var sel=document.getElementById('pftype'),m=document.getElementById('pftype-manual'),ew=document.getElementById('manual-emoji-wrap');if(sel.value==='lainnya'){m.style.display='block';m.focus();if(ew)ew.style.display='block';}else{m.style.display='none';m.value='';if(ew)ew.style.display='none';}}
 function onPlantImg(e){var f=e.target.files[0];if(!f)return;if(f.size>8*1024*1024){toast('Max 8MB');return;}var r=new FileReader();r.onload=function(ev){addImg=ev.target.result;var prev=document.getElementById('pfprev');prev.src=addImg;prev.style.display='block';document.querySelector('#psheet .iuico').style.display='none';document.querySelector('#psheet .iutxt').style.display='none';};r.readAsDataURL(f);}
 async function savePlant(){
   var name=document.getElementById('pfname').value.trim();if(!name){toast('Nama wajib diisi!');return;}
@@ -1013,7 +1081,6 @@ function reopenScan(id){
   var s=scans.find(function(x){return x.id===id;});if(!s)return;
   if(s.image){pnImgData=s.image;var th=document.getElementById('camThumb');th.src=s.image;th.style.display='block';document.getElementById('camOverlay').style.opacity='0';}
   window._scanResult={mode:s.purpose,data:s.result};
-  ;
 }
 
 function timeAgo(dateStr){
@@ -1035,11 +1102,7 @@ function setJTab(tab,btn){document.querySelectorAll('#scr-journal .jtab').forEac
 
 
 
-// ════ AI CHAT ════
-var chatHistory=[];
 
-
-function addMsg(text,role){var msgs=document.getElementById('chatmsgs');var div=document.createElement('div');div.className='cmsg '+role;div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;}
 
 
 
@@ -1067,24 +1130,6 @@ function quickLog(plantId){
 // ════ FOTO PROGRESS ════
 var fpCache={};
 
-function compressImage(file,cb){
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var img=new Image();
-    img.onload=function(){
-      var MAX=800;
-      var w=img.width,h=img.height;
-      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
-      var canvas=document.createElement('canvas');
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cb(canvas.toDataURL('image/jpeg',0.7));
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
 async function loadFP(plantId){
   if(fpCache[plantId])return fpCache[plantId];
   var res=await sbQ('bq_photos','GET',null,'plant_id=eq.'+plantId+'&username=eq.'+encodeURIComponent(CU)+'&order=date.desc');
@@ -1095,40 +1140,27 @@ async function loadFP(plantId){
 
 async function renderFP(plantId){
   var el=document.getElementById('fpgrid-'+plantId);if(!el)return;
-  el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:10px;color:var(--text-muted);font-size:11px">Memuat...</div>';
-  var photos=await loadFP(plantId);
-  if(!photos.length){
-    el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:12px;color:var(--text-muted);font-size:12px">Belum ada foto. Tambah foto pertama!</div>';
+  if(!fpCache[plantId]||!fpCache[plantId].length){
+    el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:16px;color:var(--text-muted);font-size:12px">Belum ada foto. Tambah foto pertama!</div>';
     return;
   }
-  el.innerHTML=photos.map(function(ph){
-    return'<div class="fp-item" data-pid="'+plantId+'" data-id="'+ph.id+'" data-date="'+ph.date+'" onclick="fpLightboxEl(this)">'
-      +'<img src="'+ph.img+'">'
-      +'<div class="fp-dt">'+fmtD(ph.date)+'</div>'
-      +'<button class="fp-del" onclick="delFP(event,'+ph.id+','+plantId+')">✕</button>'
+  el.innerHTML=fpCache[plantId].map(function(p){
+    return'<div style="position:relative;cursor:pointer" onclick="openFpLightbox(\''+p.img+'\',\''+fmtD(p.date)+'\')">'
+      +'<img src="'+p.img+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px">'
+      +'<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));border-radius:0 0 10px 10px;padding:4px 6px;font-size:9px;color:#fff">'+fmtD(p.date)+'</div>'
+      +'<button onclick="event.stopPropagation();delFP(event,'+p.id+','+plantId+')" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);border:none;color:#fff;width:22px;height:22px;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>'
       +'</div>';
   }).join('');
 }
 
 function openFP(plantId){
-  var inp=document.createElement('input');
-  inp.type='file';inp.accept='image/*';
-  inp.onchange=function(e){
-    var f=e.target.files[0];if(!f)return;
-    compressImage(f,async function(b64){
-      // Sheet konfirmasi tanggal
-      var dt=prompt('Tanggal foto (YYYY-MM-DD):',td());
-      if(!dt)return;
-      var res=await sbQ('bq_photos','POST',{username:CU,plant_id:plantId,image:b64,date:dt});
-      if(res&&res[0]){
-        if(!fpCache[plantId])fpCache[plantId]=[];
-        fpCache[plantId].unshift({id:res[0].id,img:b64,date:dt});
-      }
-      renderFP(plantId);
-      toast('📸 Foto progress disimpan!');
-    });
-  };
-  inp.click();
+  document.getElementById('fpPlantId').value=plantId;
+  document.getElementById('fpDate').value=td();
+  fpImgData=null;
+  var prev=document.getElementById('fpPrev');if(prev){prev.src='';prev.style.display='none';}
+  var ico=document.getElementById('fpIcoEl');if(ico)ico.style.display='block';
+  var txt=document.getElementById('fpTxtEl');if(txt)txt.style.display='block';
+  openSheet('fpsheet');
 }
 
 async function delFP(e,photoId,plantId){
@@ -1179,7 +1211,7 @@ function onCamFile(e){
 
 async function doPlantScan(){
   if(!pnImgData){toast('Pilih foto dulu!');return;}
-  if(PLANTNET_KEY==='MASUKKAN_API_KEY_DISINI'){
+  if(PLANTNET_KEY==='MASUKKAN_PLANTNET_KEY_DISINI'){
     toast('⚠️ API key belum diisi!');return;
   }
   var btn=document.getElementById('scanBtn');
@@ -1408,12 +1440,28 @@ function closeGearMenuOnClick(e){
 
 
 // ════ INIT ════
+showScr('home');
+document.getElementById('nav-home').classList.add('active');
 var savedUser=lsRaw('bq_user');
-if(savedUser){CU=savedUser;document.getElementById('login').classList.add('off');document.getElementById('ulabel').textContent=CU;document.getElementById('hgreet').textContent='Halo, '+CU+'! 👋';setSyncStatus('sync','Memuat data...');loadData();}
-else{document.getElementById('syncbar').style.display='none';}
+if(savedUser){
+  CU=savedUser;
+  document.getElementById('login').classList.add('off');
+  document.getElementById('ulabel').textContent=CU;
+  document.getElementById('hgreet').textContent='Halo, '+CU+'! 👋';
+  setSyncStatus('sync','Memuat data...');
+  loadData();
+} else {
+  document.getElementById('syncbar').style.display='none';
+}
 
 // ════ TANYA AI (GEMINI) ════
-var GEMINI_KEY='AIzaSyDc6hu5ET1te3zDXM7a6Mc-sR1otuI7Cm8';
+// ============================================================
+// 🤖 API KEY 2: Google Gemini (untuk fitur Tanya AI)
+// Daftar gratis di: https://aistudio.google.com/
+// Klik "Get API Key" → "Create API Key" → salin key-nya
+// Contoh: var GEMINI_KEY='AIzaSyXXXXXXXXXXXXXXXXXXXXXXXX';
+// ============================================================
+var GEMINI_KEY='AIzaSyAbCdEfGhIjKlMnOpQr';
 var GEMINI_URL='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=';
 var aiHistory=[];var aiInited=false;
 
@@ -1438,7 +1486,7 @@ async function sendAiMsg(){
   te.className='ai-typing';te.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
   msgs.appendChild(te);var sc=document.getElementById('aiScroll');if(sc)sc.scrollTop=sc.scrollHeight;
   try{
-    if(GEMINI_KEY==='AIzaSyDc6hu5ET1te3zDXM7a6Mc-sR1otuI7Cm8'){
+    if(GEMINI_KEY==='MASUKKAN_GEMINI_KEY_DISINI'){
       te.remove();appendAiMsg('⚠️ Isi GEMINI_KEY di kode dulu ya!','ai-bot');
       if(btn)btn.disabled=false;return;
     }
@@ -1479,8 +1527,8 @@ function setAiChip(text){
 // ════ API KEY CHECK ════
 (function(){
   var missing=[];
-  if(typeof GEMINI_KEY!=='undefined'&&GEMINI_KEY==='MASUKKAN_GEMINI_API_KEY_DISINI')missing.push('Gemini AI (GEMINI_KEY)');
-  if(typeof PLANTNET_KEY!=='undefined'&&PLANTNET_KEY==='MASUKKAN_API_KEY_DISINI')missing.push('PlantNet Scan (PLANTNET_KEY)');
+  if(typeof GEMINI_KEY!=='undefined'&&GEMINI_KEY==='MASUKKAN_GEMINI_KEY_DISINI')missing.push('Gemini AI (GEMINI_KEY)');
+  if(typeof PLANTNET_KEY!=='undefined'&&PLANTNET_KEY==='MASUKKAN_PLANTNET_KEY_DISINI')missing.push('PlantNet Scan (PLANTNET_KEY)');
   if(missing.length){
     var b=document.createElement('div');
     b.id='key-banner';
@@ -1491,6 +1539,68 @@ function setAiChip(text){
   }
 })();
 
+
+// ════ FOTO PROGRESS - SAVE & COMPRESS ════
+var fpImgData=null;
+
+function onFpImg(e){
+  var f=e.target.files[0];if(!f)return;
+  compressImg(f,800,.75).then(function(data){
+    fpImgData=data;
+    var prev=document.getElementById('fpPrev');if(prev){prev.src=data;prev.style.display='block';}
+    var ico=document.getElementById('fpIcoEl');if(ico)ico.style.display='none';
+    var txt=document.getElementById('fpTxtEl');if(txt)txt.style.display='none';
+  });
+}
+
+function compressImg(file,maxDim,quality){
+  return new Promise(function(resolve){
+    var img=new Image();var url=URL.createObjectURL(file);
+    img.onload=function(){
+      var w=img.width,h=img.height;
+      if(w>maxDim||h>maxDim){if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;}}
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);resolve(c.toDataURL('image/jpeg',quality));
+    };img.src=url;
+  });
+}
+
+async function saveFP(){
+  var plantId=parseInt(document.getElementById('fpPlantId').value);
+  var date=document.getElementById('fpDate').value;
+  if(!fpImgData){toast('Pilih foto dulu!');return;}
+  if(!date){toast('Isi tanggal!');return;}
+  var res=await sbQ('bq_photos','POST',{username:CU,plant_id:plantId,image:fpImgData,date:date});
+  if(res&&res[0]){
+    if(!fpCache[plantId])fpCache[plantId]=[];
+    fpCache[plantId].unshift({id:res[0].id,img:fpImgData,date:date});
+  }
+  closeSheet('fpsheet');
+  fpImgData=null;
+  renderFP(plantId);
+  toast('📸 Foto progress disimpan!');
+}
+
+function openFpLightbox(src,date){
+  var lb=document.getElementById('fpLightbox');if(!lb)return;
+  document.getElementById('fpLbImg').src=src;
+  document.getElementById('fpLbDate').textContent=date;
+  lb.style.display='flex';
+}
+
+function closeFpLightbox(){
+  var lb=document.getElementById('fpLightbox');if(lb)lb.style.display='none';
+}
+
+
+function selectManualEmoji(btn,emoji){
+  document.querySelectorAll('.emoji-opt').forEach(function(b){
+    b.style.background='var(--bg2)';b.style.borderColor='var(--line)';
+  });
+  btn.style.background='var(--green-pale)';btn.style.borderColor='var(--green-mid)';
+  document.getElementById('manual-emoji-sel').textContent=emoji;
+}
 </script>
 </body>
 </html>
