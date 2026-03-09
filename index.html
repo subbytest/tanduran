@@ -106,7 +106,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 .plant-card-add:hover{background:var(--green-pale)}
 
 /* SCREEN HD */
-.screen-hd{padding:18px 20px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;overflow:visible;position:sticky;top:0;background:var(--bg);z-index:50}
+.screen-hd{padding:18px 20px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;overflow:visible;background:var(--bg)}
 .screen-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--green-dark)}
 .add-btn{background:linear-gradient(135deg,var(--green-mid),var(--green-dark));color:#fff;border:none;padding:7px 16px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(26,77,46,.25)}
 .filter-row{display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
@@ -185,9 +185,9 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 .rs-time{font-size:10px;color:var(--text-muted);margin-top:4px}
 
 /* CHOOSE MODE OVERLAY */
-.overlay{position:absolute;inset:0;background:rgba(10,30,15,.5);backdrop-filter:blur(5px);z-index:80;display:none;align-items:flex-end;justify-content:center}
-.overlay.open{display:flex}
-.sheet{background:var(--white);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding:18px 18px 28px;scrollbar-width:none;animation:sup .25s cubic-bezier(.4,0,.2,1);border-top:1px solid var(--line);box-shadow:0 -8px 32px rgba(0,0,0,.12)}
+.overlay{position:absolute;inset:0;background:rgba(10,30,15,.5);backdrop-filter:blur(5px);z-index:80;display:none;align-items:flex-end;justify-content:center;pointer-events:none}
+.overlay.open{display:flex;pointer-events:all}
+.sheet{background:var(--white);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:430px;max-height:88vh;overflow-y:auto;padding:18px 18px 90px;scrollbar-width:none;animation:sup .25s cubic-bezier(.4,0,.2,1);border-top:1px solid var(--line);box-shadow:0 -8px 32px rgba(0,0,0,.12)}
 .sheet::-webkit-scrollbar{display:none}
 @keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .sheet-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px}
@@ -363,7 +363,13 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 .chatinp-row input{flex:1;padding:10px 16px;border:1.5px solid var(--line);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg2);outline:none;color:var(--text)}
 .chatinp-row input:focus{border-color:var(--green-mid);background:var(--white)}
 .chat-send{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--green-mid),var(--green-dark));border:none;color:#fff;font-size:14px;cursor:pointer;flex-shrink:0;box-shadow:0 3px 10px rgba(26,77,46,.3)}
-.cchip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--green-pale);background:var(--green-pale);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;color:var(--green-mid);font-weight:500}
+.cchip{padding:6px 14px;border-radius:20px;border:1.5px solid var(--green-pale);background:var(--green-pale);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;color:var(--green-mid);font-weight:600;white-space:nowrap;flex-shrink:0;transition:background .15s,color .15s,border-color .15s}
+.cchip:hover{background:var(--green-mid);color:#fff;border-color:var(--green-mid)}
+.ai-inp-wrap{flex-shrink:0;padding:8px 14px 12px;background:var(--bg)}
+.ai-inp-card{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;background:var(--white);border-radius:16px;box-shadow:0 4px 24px rgba(26,77,46,.14),0 1px 4px rgba(26,77,46,.06);border:1px solid var(--line)}
+.ai-inp-card input{flex:1;height:36px;padding:0 8px;border:none;font-size:13px;font-family:'DM Sans',sans-serif;background:transparent;color:var(--text);outline:none}
+.ai-inp-card input::placeholder{color:var(--text-muted)}
+.ai-inp-card button{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--green-light),var(--green-dark));border:none;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(26,77,46,.25)}
 
 /* BOTTOM NAV */
 
@@ -446,7 +452,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 #aiMessages::before{content:'';flex:1;display:block;min-height:0}
 
 /* ── NAVBAR ── */
-.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:56px;background:var(--white);border-top:1px solid var(--line);display:flex;align-items:stretch;z-index:100;padding:0}
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:56px;background:var(--white);border-top:1px solid var(--line);display:flex;align-items:stretch;z-index:100;padding:0 0 env(safe-area-inset-bottom,0)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;cursor:pointer;color:var(--text-muted);font-family:'DM Sans',sans-serif;padding:0;transition:color .15s}
 .nav-label{font-size:9.5px;font-weight:600;letter-spacing:.01em;line-height:1}
 .nav-icon{font-size:18px;line-height:1;display:block}
@@ -454,8 +460,8 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 .center-btn{position:relative}
 .center-btn .nav-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--green-light),var(--green-mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 3px 12px rgba(82,183,136,.45);margin-top:-14px;margin-bottom:1px}
 /* ── AI SCREEN ── */
-#scr-stats{display:none!important;padding-bottom:0!important;overflow:hidden!important}
-#scr-stats.on{display:flex!important;flex-direction:column;overflow:hidden!important;padding-bottom:0!important}
+#scr-stats{display:none!important;padding:0!important;overflow:hidden!important}
+#scr-stats.on{display:flex!important;flex-direction:column;overflow:hidden!important;padding:0 0 56px 0!important}
 </style>
 </head>
 <body>
@@ -569,29 +575,31 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
 <!-- AI TIPS -->
 <div class="scr" id="scr-stats">
-  <div style="padding:14px 20px 10px;flex-shrink:0;border-bottom:1px solid var(--line)">
+  <div style="padding:14px 20px 10px;border-bottom:1px solid var(--line);flex-shrink:0">
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--green-dark)">✨ Tanya AI</div>
   </div>
-  <div style="padding:8px 16px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0">
+  <div style="display:flex;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid var(--line)">
     <button class="cchip" onclick="setAiChip('Cara merawat kaktus')">🌵 Kaktus</button>
     <button class="cchip" onclick="setAiChip('Daun menguning kenapa?')">🍂 Daun Kuning</button>
     <button class="cchip" onclick="setAiChip('Cara basmi hama tanaman')">🐛 Hama</button>
     <button class="cchip" onclick="setAiChip('Tips repotting tanaman')">🪴 Repotting</button>
     <button class="cchip" onclick="setAiChip('Jadwal penyiraman yang baik')">💧 Siram</button>
   </div>
-  <div id="aiScroll" style="flex:1;overflow-y:auto;scrollbar-width:none;min-height:0;display:flex;flex-direction:column">
-    <div style="flex:1;min-height:16px"></div>
-    <div id="aiMessages" style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px"></div>
+  <div id="aiScroll" style="flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:12px 16px 8px;-webkit-overflow-scrolling:touch;min-height:0">
+    <div id="aiMessages" style="display:flex;flex-direction:column;gap:10px;min-height:100%;justify-content:flex-end"></div>
   </div>
-  <div style="padding:10px 16px 16px;display:flex;gap:10px;align-items:center;flex-shrink:0;border-top:1px solid var(--line);background:var(--white)">
-    <input id="aiInput" type="text" placeholder="Tanya tentang tanamanmu..." style="flex:1;padding:12px 18px;border:1.5px solid var(--line);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg2);outline:none;color:var(--text);-webkit-appearance:none" onkeydown="if(event.key==='Enter')sendAiMsg()">
-    <button onclick="sendAiMsg()" id="aiSendBtn" style="width:44px;height:44px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--green-light),var(--green-dark));border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,77,46,.3)">➤</button>
+  <div class="ai-inp-wrap">
+    <div class="ai-inp-card">
+      <input id="aiInput" type="text" placeholder="Tanya tentang tanamanmu..."
+        autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+        onkeydown="if(event.key==='Enter')sendAiMsg()">
+      <button id="aiSendBtn" onclick="sendAiMsg()">➤</button>
+    </div>
   </div>
 </div>
 <div class="scr" id="scr-journal">
   <div class="screen-hd">
     <div class="screen-title">Jurnal</div>
-    <button class="add-btn" onclick="openSheet('jsheet')">+ Catat</button>
   </div>
   <div class="jnl-tabs">
     <button class="jtab on" id="jt-care" onclick="setJTab('care',this)">🌿 Perawatan</button>
@@ -776,7 +784,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 // Setelah login → klik nama kamu → "My profile" → salin API key
 // Contoh: var PLANTNET_KEY='2b3xXXXXXXXXXXXXXXXXXXXX';
 // ============================================================
-var PLANTNET_KEY='2b10CJSGtPl09xQC5iyd7E6mQu';
+var PLANTNET_KEY='2b10U4FggShOkdudlJPFa6Jpe';
 
 var SBURL='https://atinplsrmgkcgsdwvhiw.supabase.co';
 var SBKEY='sb_publishable__s0F7wR6_cJElrsrg9NjrA_R1NTzhWW';
@@ -841,7 +849,9 @@ function doLogin(){
   loadData();
 }
 function showAccountMenu(){
+  var existing=document.getElementById('accountModal');if(existing)existing.remove();
   var modal=document.createElement('div');
+  modal.id='accountModal';
   modal.style.cssText='position:absolute;inset:0;background:rgba(10,30,15,.5);z-index:999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
   var inner=document.createElement('div');
   inner.style.cssText='background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:480px;padding:20px 20px 36px;';
@@ -864,35 +874,52 @@ function showAccountMenu(){
 async function loadData(){
   try{
     var enc=encodeURIComponent(CU);
-    var results=await Promise.all([sbQ('bq_plants','GET',null,'username=eq.'+enc+'&order=created_at.asc'),sbQ('bq_jnls','GET',null,'username=eq.'+enc+'&order=date.desc'),sbQ('bq_scans','GET',null,'username=eq.'+enc+'&order=created_at.desc&limit=50'),sbQ('bq_photos','GET',null,'username=eq.'+enc+'&order=date.desc')]);
-    var sbP=results[0],sbJ=results[1],sbS=results[2],sbPh=results[3];
+    // Step 1: Load data utama dulu (cepat) — render UI segera
+    var results=await Promise.all([
+      sbQ('bq_plants','GET',null,'username=eq.'+enc+'&order=created_at.asc'),
+      sbQ('bq_jnls','GET',null,'username=eq.'+enc+'&order=date.desc')
+    ]);
+    var sbP=results[0],sbJ=results[1];
     if(sbP!==null){plants=sbP.map(function(r){return{id:parseInt(r.id),name:r.name,type:r.type,emoji:r.emoji,image:r.image,water:r.water,fert:r.fert,lastWater:r.last_water,lastFert:r.last_fert,health:r.health,notes:r.notes,added:r.added};});pid=plants.length?Math.max.apply(null,plants.map(function(p){return p.id;}))+1:1;setSyncStatus('ok','☁️ Data tersinkron');}
     else{plants=lsGet('bq_p_'+CU,[]);setSyncStatus('err','⚠️ Offline — data lokal');}
-    if(sbJ!==null){jnls=sbJ.map(function(r){return{id:parseInt(r.id),plantId:parseInt(r.plant_id),type:r.type,note:r.note,date:r.date};});jid=jnls.length?Math.max.apply(null,jnls.map(function(j){return j.id;}))+1:1;}else{jnls=lsGet('bq_j_'+CU,[]);}
-    if(sbS!==null){
-      scans=sbS.map(function(r){return{id:r.id,purpose:r.purpose,name:r.name,type:r.type,emoji:r.emoji,health:r.health,confidence:r.confidence,healthNote:r.health_note,result:r.result,image:r.image,date:r.created_at};});
-      // Sync Pl@ntNet scans to localStorage
-      var pnScans=sbS.filter(function(r){return r.purpose==='plantnet';}).map(function(r){
-        return{sbId:r.id,name:r.name,sci:r.health_note||'',score:r.confidence||0,date:r.created_at?r.created_at.slice(0,10):td(),img:r.image||''};
-      });
-      if(pnScans.length)saveScanHist(pnScans);
-    }else{scans=lsGet('bq_s_'+CU,[]);}
-  }catch(e){plants=lsGet('bq_p_'+CU,[]);jnls=lsGet('bq_j_'+CU,[]);scans=lsGet('bq_s_'+CU,[]);setSyncStatus('err','⚠️ Gagal terhubung');saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();}
-  // Load photos into fpCache (sudah paralel di Promise.all)
-  if(sbPh&&sbPh.length){
-    fpCache={};
-    sbPh.forEach(function(ph){
-      var pid=parseInt(ph.plant_id);
-      if(!fpCache[pid])fpCache[pid]=[];
-      fpCache[pid].push({id:ph.id,img:ph.image,date:ph.date});
-    });
+    if(sbJ!==null){jnls=sbJ.map(function(r){return{id:parseInt(r.id),plantId:parseInt(r.plant_id),type:r.type,note:r.note,date:r.date};});jid=jnls.length?Math.max.apply(null,jnls.map(function(j){return j.id;}))+1:1;}
+    else{jnls=lsGet('bq_j_'+CU,[]);}
+    // Render UI segera setelah data utama siap
+    saveLocal();renderHome();renderPlants();renderJnl();renderScanRow();
+    setTimeout(function(){document.getElementById('syncbar').style.display='none';},2000);
+    // Step 2: Load scans & photos di background (tidak blok UI)
+    Promise.all([
+      sbQ('bq_scans','GET',null,'username=eq.'+enc+'&order=created_at.desc&limit=50'),
+      sbQ('bq_photos','GET',null,'username=eq.'+enc+'&order=date.desc')
+    ]).then(function(r2){
+      var sbS=r2[0],sbPh=r2[1];
+      if(sbS!==null){
+        scans=sbS.map(function(r){return{id:r.id,purpose:r.purpose,name:r.name,type:r.type,emoji:r.emoji,health:r.health,confidence:r.confidence,healthNote:r.health_note,result:r.result,image:r.image,date:r.created_at};});
+        var pnScans=sbS.filter(function(r){return r.purpose==='plantnet';}).map(function(r){
+          return{sbId:r.id,name:r.name,sci:r.health_note||'',score:r.confidence||0,date:r.created_at?r.created_at.slice(0,10):td(),img:r.image||''};
+        });
+        if(pnScans.length)saveScanHist(pnScans);
+        renderScanHist();
+      }else{scans=lsGet('bq_s_'+CU,[]);}
+      if(sbPh&&sbPh.length){
+        fpCache={};
+        sbPh.forEach(function(ph){
+          var pid=parseInt(ph.plant_id);
+          if(!fpCache[pid])fpCache[pid]=[];
+          fpCache[pid].push({id:ph.id,img:ph.image,date:ph.date});
+        });
+      }
+    }).catch(function(){scans=lsGet('bq_s_'+CU,[]);});
+  }catch(e){
+    plants=lsGet('bq_p_'+CU,[]);jnls=lsGet('bq_j_'+CU,[]);scans=lsGet('bq_s_'+CU,[]);
+    setSyncStatus('err','⚠️ Gagal terhubung');
+    saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();
   }
-  saveLocal();renderHome();renderPlants();renderJnl();renderScanHist();renderScanRow();
-  setTimeout(function(){document.getElementById('syncbar').style.display='none';},2000);
 }
 
 // ════ NAV ════
 function showScr(n){
+  ['accountModal','mgtmodal'].forEach(function(id){var el=document.getElementById(id);if(el)el.remove();});
   if(n==='stats'){setTimeout(initAiScreen,50);}
   if(n==='scan'){pnImgData=null;var t=document.getElementById('camThumb');var o=document.getElementById('camOverlay');if(t)t.style.display='none';if(o)o.style.display='flex';var b=document.getElementById('scanBtn');if(b){b.disabled=true;b.style.opacity='.4';}document.getElementById('scanBtnTxt').textContent='🔍 Pilih foto dulu';document.getElementById('scanResult').innerHTML='';renderScanHist();}
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
@@ -913,16 +940,16 @@ function openSheet(id){
     setPfTab('file',document.getElementById('pft-file'));
   }
   if(id==='jsheet'){
+    if(!plants.length){toast('⚠️ Tambah tanaman dulu!');return;}
     if(!document.getElementById('jfid').value){document.getElementById('jstitle').textContent='Tambah Catatan';document.getElementById('jfid').value='';document.getElementById('jfnote').value='';document.getElementById('jfdate').value=td();document.getElementById('jftype').value='water';}
     var sel=document.getElementById('jfplant');sel.innerHTML=plants.map(function(p){return'<option value="'+p.id+'">'+(p.emoji||'🌿')+' '+p.name+'</option>';}).join('');
-    if(!plants.length){toast('Tambah tanaman dulu!');return;}
   }
   document.getElementById(id).classList.add('open');
 }
 function closeSheet(id){
   document.getElementById(id).classList.remove('open');
   if(id==='psheet'){document.getElementById('pfid').value='';stopPlantCam();}
-  if(id==='jsheet')document.getElementById('jfid').value='';
+  if(id==='jsheet'){document.getElementById('jfid').value='';}
 }
 
 // ════ HOME ════
@@ -1039,7 +1066,7 @@ async function savePlant(){
   else{var np=Object.assign({id:pid++,health:'good',lastWater:t,lastFert:t,added:t},data);var row={username:CU,name:np.name,type:np.type,emoji:np.emoji,image:np.image,water:np.water,fert:np.fert,last_water:t,last_fert:t,health:'good',notes:np.notes,added:t};var res=await sbQ('bq_plants','POST',row);if(res&&res[0])np.id=res[0].id;plants.push(np);pid=Math.max(pid,np.id+1);toast('🌱 Ditambahkan!');tipI++;}
   saveLocal();closeSheet('psheet');renderPlants();renderHome();
 }
-function editPlant(id){var p=plants.find(function(x){return x.id===id;});if(!p)return;document.getElementById('pstitle').textContent='Edit Tanaman';document.getElementById('pfid').value=id;document.getElementById('pfname').value=p.name;populateTypeSelect();var me=document.getElementById('pftype-manual');if(me){me.value='';me.style.display='none';}document.getElementById('pftype').value=p.type;document.getElementById('pfwater').value=p.water;document.getElementById('pffert').value=p.fert;document.getElementById('pfnotes').value=p.notes||'';addImg=p.image||null;var prev=document.getElementById('pfprev');if(p.image){prev.src=p.image;prev.style.display='block';document.querySelector('#psheet .iuico').style.display='none';document.querySelector('#psheet .iutxt').style.display='none';}else{prev.style.display='none';document.querySelector('#psheet .iuico').style.display='block';document.querySelector('#psheet .iutxt').style.display='block';}closeDetail();openSheet('psheet');}
+function editPlant(id){var p=plants.find(function(x){return x.id===id;});if(!p)return;document.getElementById('pstitle').textContent='Edit Tanaman';document.getElementById('pfid').value=id;document.getElementById('pfname').value=p.name;populateTypeSelect();var me=document.getElementById('pftype-manual');if(me){me.value='';me.style.display='none';}document.getElementById('pftype').value=p.type;document.getElementById('pfwater').value=p.water;document.getElementById('pffert').value=p.fert;document.getElementById('pfnotes').value=p.notes||'';addImg=p.image||null;var prev=document.getElementById('pfprev');if(p.image){prev.src=p.image;prev.style.display='block';document.querySelector('#psheet .iuico').style.display='none';document.querySelector('#psheet .iutxt').style.display='none';}else{prev.style.display='none';document.querySelector('#psheet .iuico').style.display='block';document.querySelector('#psheet .iutxt').style.display='block';}closeDetail();setTimeout(function(){openSheet('psheet');},300);}
 
 // ════ MANAGE TYPES ════
 
@@ -1124,7 +1151,8 @@ function quickLog(plantId){
   document.getElementById('jftype').value='note';
   var sel=document.getElementById('jfplant');
   sel.innerHTML=plants.map(function(x){return'<option value="'+x.id+'"'+(x.id===plantId?' selected':'')+'>'+( x.emoji||'🌿')+' '+x.name+'</option>';}).join('');
-  openSheet('jsheet');
+  closeDetail();
+  setTimeout(function(){openSheet('jsheet');},300);
 }
 
 
@@ -1269,11 +1297,7 @@ async function doPlantScan(){
 function renderScanResults(data){
   var result=document.getElementById('scanResult');
   if(!data.results||!data.results.length){
-    result.innerHTML='<div style="padding:16px;text-align:center">'
-    +'<div style="font-size:28px;margin-bottom:8px">🔍</div>'
-    +'<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Tanaman tidak teridentifikasi</div>'
-    +'<div style="font-size:12px;color:var(--text-muted);line-height:1.5">Coba foto lebih dekat, pencahayaan lebih terang, atau pilih bagian daun/bunga yang jelas.</div>'
-    +'</div>';
+    result.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Tanaman tidak dikenali. Coba foto yang lebih jelas.</div>';
     return;
   }
   var top3=data.results.slice(0,3);
@@ -1459,7 +1483,7 @@ if(savedUser){
 // Klik "Get API Key" → "Create API Key" → salin key-nya
 // Contoh: var GEMINI_KEY='AIzaSyXXXXXXXXXXXXXXXXXXXXXXXX';
 // ============================================================
-var GEMINI_KEY='AIzaSyCfLf0h98OM4CO0Q6WaEUZ2T6L03DmXSMc';
+var GEMINI_KEY='AIzaSyB702vqu7zhy7cJknzCii62opM9dOYV30I';
 var GEMINI_URL='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=';
 var aiHistory=[];var aiInited=false;
 
@@ -1602,4 +1626,3 @@ function selectManualEmoji(btn,emoji){
 </script>
 </body>
 </html>
-
