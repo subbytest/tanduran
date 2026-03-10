@@ -273,11 +273,11 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
 .td{background:var(--red-bg);color:var(--red)}
 
 /* ── STATS ── */
-.streak-card{background:linear-gradient(135deg,var(--green),var(--gm));border-radius:var(--r);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px;margin:0 14px 10px;box-shadow:var(--sh)}
+.streak-card{background:linear-gradient(135deg,var(--green),var(--gm));border-radius:var(--r);padding:12px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;margin:0 14px 10px;box-shadow:var(--sh)}
 [data-theme="dark"] .streak-card{background:linear-gradient(135deg,#0f2018,#142818);border:1px solid var(--line)}
-.streak-num{font-family:'Fraunces',serif;font-size:42px;font-weight:700;color:#fff;line-height:1}
-.streak-title{color:#fff;font-size:13px;font-weight:700}
-.streak-sub{color:rgba(255,255,255,.6);font-size:11px}
+.streak-num{font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:#fff;line-height:1}
+.streak-title{color:#fff;font-size:12px;font-weight:700;margin-top:2px}
+.streak-sub{color:rgba(255,255,255,.6);font-size:10px}
 [data-theme="dark"] .streak-num{color:var(--gl)}
 [data-theme="dark"] .streak-title{color:var(--gl)}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0 14px 10px}
@@ -495,7 +495,10 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
     <div class="fg"><label class="fl">Nama Tanaman *</label><input class="fi" id="pfName" placeholder="Contoh: Bonsai Serut Mini"></div>
     <div class="fg">
       <label class="fl">Jenis</label>
-      <select class="fsel" id="pfType" onchange="onTypeChange()"></select>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <select class="fsel" id="pfType" onchange="onTypeChange()" style="flex:1"></select>
+        <button type="button" onclick="openMgtSheet()" style="flex-shrink:0;padding:10px 11px;border:1.5px solid var(--line);border-radius:var(--rs);background:var(--bg2);font-size:13px;cursor:pointer;color:var(--muted)" title="Kelola jenis">⚙️</button>
+      </div>
       <div id="newTypeWrap" style="display:none;margin-top:8px">
         <input class="fi" id="pfTypeNew" placeholder="Nama jenis baru..." style="margin-bottom:6px">
         <label class="fl">Pilih Emoji</label>
@@ -556,6 +559,33 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
   </div>
 </div>
 
+<!-- ══ SHEET: MANAGE TYPES ══ -->
+<div class="ov" id="mgtSheet" onclick="if(event.target===this)closeMgtSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-handle"></div>
+    <div class="sh-hd"><button class="sh-back" onclick="closeMgtSheet()">←</button><div class="sh-title">Kelola Jenis</div></div>
+    <div id="mgtList"></div>
+    <div style="height:8px;border-top:1px solid var(--line2);margin-top:10px;padding-top:12px">
+      <button class="submt" style="background:linear-gradient(135deg,var(--gl),var(--green))" onclick="closeMgtSheet();setTimeout(function(){document.getElementById('pfType').value='__new__';onTypeChange();},100)">➕ Tambah Jenis Baru</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHEET: EDIT JENIS ══ -->
+<div class="ov" id="editTypeSheet" onclick="if(event.target===this)closeEditTypeSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-handle"></div>
+    <div class="sh-hd"><button class="sh-back" onclick="closeEditTypeSheet()">←</button><div class="sh-title">Edit Jenis</div></div>
+    <input type="hidden" id="etId">
+    <div class="fg"><label class="fl">Nama Jenis</label><input class="fi" id="etName" placeholder="Nama jenis tanaman"></div>
+    <div class="fg">
+      <label class="fl">Emoji</label>
+      <div class="emoji-row" id="etEmojiRow"></div>
+    </div>
+    <button class="submt" onclick="saveEditType()">💾 Simpan Perubahan</button>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div id="lb" onclick="closeLB()">
   <button class="lb-close" onclick="closeLB()">✕</button>
@@ -597,7 +627,7 @@ var DEF_TYPES=[
   {id:'lainnya',label:'Lainnya',emoji:'✏️'}
 ];
 
-var EMOJIS=['🌿','🌱','🌸','🌺','🌻','🌼','🍀','🌵','🎋','🎍','🪴','🌳','🌲','🍃','🌴','🌹','🌷','🍁'];
+var EMOJIS=['🌿','🌱','🌸','🌺','🌻','🌼','🍀','🌵','🎋','🎍','🪴','🌳','🌲','🍃','🌴','🌹','🌷','🍁','🍂','🌾','🪻','🫧','🌊','🪸','🍄','🌰','🥀','💐','🍋','🍎','🍇','🍓','🥝','🥭','🍑','🌽','🥦','🥬','🌶️','🫑','🧅','🧄','🪨','🪵','🌙','⭐','🔮','🫐','🍒','🍊'];
 
 var CARE_INFO={
   bonsai:{light:'Full sun 4–6 jam',temp:'15–30°C',humid:'Sedang',soil:'Akadama mix'},
@@ -1364,8 +1394,8 @@ function renderStats(){
   var html=
     '<div class="streak-card">'
     +'<div class="streak-num">'+streak+'🔥</div>'
-    +'<div class="streak-title">Hari Berturut-turut</div>'
-    +'<div class="streak-sub">'+(streak>0?'Keren! Terus konsisten!':'Mulai merawat hari ini!')+'</div>'
+    +'<div><div class="streak-title">Hari Berturut-turut</div>'
+    +'<div class="streak-sub">'+(streak>0?'Keren! Terus konsisten!':'Mulai merawat hari ini!')+'</div></div>'
     +'</div>'
     +'<div class="stats-grid">'
     +'<div class="sg-card"><div class="sg-ico">💧</div><div class="sg-num">'+c.water+'</div><div class="sg-lbl">Siram</div></div>'
@@ -1530,6 +1560,93 @@ function doCheck(){
 }
 function resetCheck(){
   renderSymptoms();
+}
+
+// ── MANAGE TYPES ─────────────────────────────────────────
+var DEF_TYPE_IDS=DEF_TYPES.map(function(t){return t.id;});
+var etSelEmoji='🌿';
+
+function openMgtSheet(){
+  renderMgtList();
+  document.getElementById('mgtSheet').classList.add('open');
+}
+function closeMgtSheet(){
+  document.getElementById('mgtSheet').classList.remove('open');
+  popTypeSelect();
+}
+
+function renderMgtList(){
+  var types=getTypes().filter(function(t){return t.id!=='__new__';});
+  var html='';
+  types.forEach(function(t){
+    var usedCount=plants.filter(function(p){return p.type===t.id;}).length;
+    var canDelete=usedCount===0;
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line2)">'
+      +'<div style="width:36px;height:36px;border-radius:9px;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+(t.emoji||'🌿')+'</div>'
+      +'<div style="flex:1">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+t.label+'</div>'
+      +'<div style="font-size:10.5px;color:var(--muted);margin-top:1px">'+usedCount+' tanaman</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:5px">'
+      +'<button onclick="openEditType(\''+t.id+'\')" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);font-size:13px;cursor:pointer">✏️</button>'
+      +(canDelete
+        ?'<button onclick="deleteType(\''+t.id+'\')" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--red-ln);background:var(--red-bg);font-size:13px;cursor:pointer">🗑️</button>'
+        :'<button disabled title="Dipakai '+usedCount+' tanaman" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);font-size:13px;opacity:.3;cursor:not-allowed">🗑️</button>')
+      +'</div></div>';
+  });
+  document.getElementById('mgtList').innerHTML=html;
+}
+
+function deleteType(id){
+  var t=getTypes().find(function(x){return x.id===id;});if(!t)return;
+  var usedCount=plants.filter(function(p){return p.type===id;}).length;
+  if(usedCount>0){toast('❌ Masih dipakai '+usedCount+' tanaman!');return;}
+  var m=document.createElement('div');m.id='_dtMod';
+  m.style.cssText='position:absolute;inset:0;background:rgba(10,20,12,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  m.innerHTML='<div style="background:var(--card);border-radius:20px 20px 0 0;width:100%;padding:22px 18px 38px;text-align:center;border-top:1px solid var(--line)">'
+    +'<div style="font-size:32px;margin-bottom:8px">'+t.emoji+'</div>'
+    +'<div style="font-family:Fraunces,serif;font-size:18px;color:var(--text);margin-bottom:5px;font-weight:700">Hapus "'+t.label+'"?</div>'
+    +'<div style="font-size:12px;color:var(--muted);margin-bottom:20px">Jenis ini belum dipakai tanaman manapun.</div>'
+    +'<button id="_dtY" style="width:100%;padding:12px;border-radius:11px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:7px">Ya, Hapus</button>'
+    +'<button id="_dtN" style="width:100%;padding:12px;border-radius:11px;border:1.5px solid var(--line);background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted)">Batal</button>'
+    +'</div>';
+  document.getElementById('app').appendChild(m);
+  document.getElementById('_dtY').onclick=function(){
+    var types=getTypes().filter(function(x){return x.id!==id;});
+    saveTypes(types);m.remove();renderMgtList();toast('🗑️ Jenis dihapus');
+  };
+  document.getElementById('_dtN').onclick=function(){m.remove();};
+  m.onclick=function(e){if(e.target===m)m.remove();};
+}
+
+function openEditType(id){
+  var t=getTypes().find(function(x){return x.id===id;});if(!t)return;
+  etSelEmoji=t.emoji;
+  document.getElementById('etId').value=id;
+  document.getElementById('etName').value=t.label;
+  // build emoji picker
+  document.getElementById('etEmojiRow').innerHTML=EMOJIS.map(function(e){
+    return '<button class="emoji-opt'+(e===t.emoji?' on':'')+'" onclick="pickEtEmoji(this,\''+e+'\')" type="button">'+e+'</button>';
+  }).join('');
+  document.getElementById('editTypeSheet').classList.add('open');
+}
+function closeEditTypeSheet(){document.getElementById('editTypeSheet').classList.remove('open');}
+function pickEtEmoji(btn,e){
+  document.querySelectorAll('#etEmojiRow .emoji-opt').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');etSelEmoji=e;
+}
+function saveEditType(){
+  var id=document.getElementById('etId').value;
+  var name=document.getElementById('etName').value.trim();
+  if(!name){toast('Isi nama jenis!');return;}
+  var types=getTypes();
+  var idx=types.findIndex(function(x){return x.id===id;});
+  if(idx>-1){types[idx].label=name;types[idx].emoji=etSelEmoji;saveTypes(types);}
+  // update tanaman yang pakai jenis ini
+  plants.forEach(function(p){if(p.type===id){p.emoji=etSelEmoji;}});
+  saveL();
+  closeEditTypeSheet();renderMgtList();popTypeSelect();
+  toast('✅ Jenis diupdate!');
 }
 
 // ── INIT ──────────────────────────────────────────────────
