@@ -1680,6 +1680,8 @@ function saveEditType(){
 // ── INIT ──────────────────────────────────────────────────
 (function init(){
   initTheme();
+  // Warm up Vercel function
+  fetch(APIURL+'/api/db/bq_users?select=id&username=eq.__warmup__').catch(function(){});
   var savedUser=lsR('bq_user');
   var savedUID=lsR('bq_uid');
   if(savedUser&&savedUser.length>=2&&savedUID){
