@@ -305,7 +305,7 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
 .ni-scan .ni-ico{width:40px;height:40px;background:linear-gradient(135deg,var(--gl),var(--green));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 3px 12px rgba(44,74,53,.3);margin-top:-14px;margin-bottom:1px}
 
 /* ── OVERLAYS ── */
-.ov{position:fixed;inset:0;z-index:80;background:rgba(10,20,12,.5);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center;pointer-events:none}
+.ov{position:absolute;inset:0;z-index:80;background:rgba(10,20,12,.5);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center;pointer-events:none}
 .ov.open{display:flex;pointer-events:all}
 .sheet{background:var(--card);border-radius:18px 18px 0 0;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;padding:0 16px 40px;border-top:1px solid var(--line);animation:shUp .24s cubic-bezier(.4,0,.2,1)}
 @keyframes shUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -358,21 +358,12 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
   <div class="l-logo">Bot<em>aniq</em></div>
   <div class="l-sub">Plant care, digitalized.</div>
   <div class="l-box">
-    <div style="display:flex;background:rgba(0,0,0,.1);border-radius:8px;padding:3px;margin-bottom:18px">
-      <div id="bq-tab-login" style="flex:1;padding:8px;text-align:center;font-size:13px;font-weight:700;border-radius:6px;background:var(--card);cursor:pointer" onclick="bqTab('login')">Masuk</div>
-      <div id="bq-tab-register" style="flex:1;padding:8px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer" onclick="bqTab('register')">Daftar</div>
-    </div>
-    <label class="l-lbl">Username</label>
-    <input class="l-inp" id="liInp" type="text" placeholder="Contoh: petani666"
-      autocomplete="username" autocorrect="off" autocapitalize="none" spellcheck="false"
-      onkeydown="if(event.key==='Enter')document.getElementById('liPin').focus()">
-    <label class="l-lbl" style="margin-top:12px">PIN (6 digit)</label>
-    <input class="l-inp" id="liPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••"
-      autocomplete="current-password"
+    <label class="l-lbl">Username kamu</label>
+    <input class="l-inp" id="liInp" type="text" placeholder="Contoh: petani666, kebunku"
+      autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
       onkeydown="if(event.key==='Enter')doLogin()">
-    <div id="bq-err" style="font-size:12px;color:#e74c3c;min-height:16px;margin:6px 0"></div>
-    <button class="l-btn" id="bq-btn" onclick="doLogin()">🌱 Masuk ke Botaniq</button>
-    <div class="l-note">1 akun untuk RideLog, Duitku & Botaniq ☁️</div>
+    <button class="l-btn" onclick="doLogin()">🌱 Masuk ke Botaniq</button>
+    <div class="l-note"><strong>Username = kunci data kamu.</strong><br>Pakai username yang sama untuk sync otomatis ☁️</div>
   </div>
 </div>
 
@@ -612,12 +603,12 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
 <script>
 'use strict';
 // ── CONFIG ──────────────────────────────────────────────
-var SBURL='https://ythivuubmvjjfpwjhimw.supabase.co';
-var SBKEY='sb_publishable_hU36I64wMEwgc4F6kOKrIQ_ePd2FLUt';
+var APIURL='https://api-ruby-two-84.vercel.app';
 var PNKEY='2b10U4FggShOkdudlJPFa6Jpe'; // ganti dengan PlantNet API key kamu
 
 // ── STATE ────────────────────────────────────────────────
-var CU='', UID='', plants=[], jnls=[], fpCache={}; // CU=username display, UID=user_id UUID
+var CU='', CUID='', plants=[], jnls=[], fpCache={};
+function nuid(){return([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));}
 var pid=1, jid=1, pFilt='all', detId=null;
 var addImg=null, tlImg=null, scanImg=null;
 var tipIdx=0, selEmoji='🌿';
@@ -740,7 +731,7 @@ function ls(k,fb){try{var v=localStorage.getItem(k);return v!==null?JSON.parse(v
 function lsS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function lsR(k){return localStorage.getItem(k)||'';}
 function lsRS(k,v){localStorage.setItem(k,v||'');}
-function saveL(){lsS('bq_p_'+UID,plants);lsS('bq_j_'+UID,jnls);lsS('bq_fp_'+UID,fpCache);}
+function saveL(){lsS('bq_p_'+CU,plants);lsS('bq_j_'+CU,jnls);lsS('bq_fp_'+CU,fpCache);}
 function today(){return new Date().toISOString().split('T')[0];}
 function dueDate(last,iv){if(!last)return today();var d=new Date(last);d.setDate(d.getDate()+parseInt(iv));return d.toISOString().split('T')[0];}
 function daysUntil(s){var a=new Date();a.setHours(0,0,0,0);var b=new Date(s);b.setHours(0,0,0,0);return Math.round((b-a)/86400000);}
@@ -775,12 +766,11 @@ function compressImg(file,maxDim,q){
   });
 }
 
-// ── SUPABASE ─────────────────────────────────────────────
+// ── API ───────────────────────────────────────────────────
 async function sbQ(table,method,body,params){
-  var url=SBURL+'/rest/v1/'+table+(params?'?'+params:'');
-  var h={'apikey':SBKEY,'Authorization':'Bearer '+SBKEY,'Content-Type':'application/json','Prefer':'return=representation'};
+  var url=APIURL+'/api/db/'+table+(params?'?'+params:'');
   try{
-    var r=await fetch(url,{method:method||'GET',headers:h,body:body?JSON.stringify(body):null});
+    var r=await fetch(url,{method:method||'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):null});
     if(!r.ok)return null;
     var ct=r.headers.get('content-type')||'';
     return ct.includes('json')?await r.json():[];
@@ -802,55 +792,34 @@ function toggleTheme(){
 }
 
 // ── LOGIN ─────────────────────────────────────────────────
-var bqMode='login';
-function bqTab(m){
-  bqMode=m;
-  var isLogin=m==='login';
-  document.getElementById('bq-tab-login').style.background=isLogin?'var(--card)':'transparent';
-  document.getElementById('bq-tab-login').style.color=isLogin?'var(--text)':'var(--muted)';
-  document.getElementById('bq-tab-register').style.background=isLogin?'transparent':'var(--card)';
-  document.getElementById('bq-tab-register').style.color=isLogin?'var(--muted)':'var(--text)';
-  document.getElementById('bq-btn').textContent=isLogin?'🌱 Masuk ke Botaniq':'✨ Daftar';
-  document.getElementById('bq-err').textContent='';
-}
-async function bqHashPin(pin){
-  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pin));
-  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
-}
 async function doLogin(){
-  var u=document.getElementById('liInp').value.trim().toLowerCase();
-  var p=document.getElementById('liPin').value.trim();
-  var err=document.getElementById('bq-err');err.textContent='';
-  if(u.length<3){err.textContent='Username minimal 3 karakter';return;}
-  if(!/^\d{6}$/.test(p)){err.textContent='PIN harus 6 digit angka';return;}
-  var ph=await bqHashPin(p);
-  var btn=document.getElementById('bq-btn');btn.textContent='Memuat...';btn.disabled=true;
+  var raw=document.getElementById('liInp').value.trim();
+  if(!raw){toast('Isi username dulu!');return;}
+  var uname=raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').substring(0,20);
+  if(!uname||uname.length<2){toast('Username terlalu pendek!');return;}
+  var btn=document.getElementById('liBtnLogin');
+  if(btn){btn.textContent='Memuat...';btn.disabled=true;}
   try{
-    if(bqMode==='register'){
-      var ex=await sbQ('rl_users','GET',null,'username=eq.'+u+'&select=id,pin_hash');
-      if(ex&&ex.length){
-        if(ex[0].pin_hash){err.textContent='Username sudah terdaftar, silakan Masuk';btn.textContent='✨ Daftar';btn.disabled=false;return;}
-        await sbQ('rl_users','PATCH',{pin_hash:ph},'id=eq.'+ex[0].id);
-        CU=u;UID=ex[0].id;
-      }else{
-        var newId=crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
-        await sbQ('rl_users','POST',{id:newId,username:u,pin_hash:ph});
-        CU=u;UID=newId;
-      }
+    var existing=await sbQ('bq_users','GET',null,'username=eq.'+encodeURIComponent(uname)+'&select=id,username');
+    var usr;
+    if(existing&&existing.length){
+      usr=existing[0];
     }else{
-      var users=await sbQ('rl_users','GET',null,'username=eq.'+u+'&select=id,username,pin_hash');
-      if(!users||!users.length){err.textContent='Username tidak ditemukan';btn.textContent='🌱 Masuk ke Botaniq';btn.disabled=false;return;}
-      var usr=users[0];
-      if(!usr.pin_hash){err.textContent='Akun belum punya PIN. Gunakan menu Daftar.';btn.textContent='🌱 Masuk ke Botaniq';btn.disabled=false;return;}
-      if(usr.pin_hash!==ph){err.textContent='PIN salah';btn.textContent='🌱 Masuk ke Botaniq';btn.disabled=false;return;}
-      CU=u;UID=usr.id;
+      var created=await sbQ('bq_users','POST',{id:nuid(),username:uname});
+      usr=created&&created[0]?created[0]:{id:nuid(),username:uname};
     }
-    lsRS('bq_user',CU);lsRS('bq_uid',UID);
+    CU=usr.username;
+    CUID=usr.id;
+    lsRS('bq_user',CU);
+    lsRS('bq_uid',CUID);
     document.getElementById('uLabel').textContent=CU;
     document.getElementById('heroGr').textContent='Halo, '+CU+'! 👋';
     document.getElementById('loginScr').classList.add('off');
     loadData();
-  }catch(e){err.textContent='Gagal: '+e.message;btn.textContent=bqMode==='login'?'🌱 Masuk ke Botaniq':'✨ Daftar';btn.disabled=false;}
+  }catch(e){
+    toast('Gagal login: '+e.message);
+    if(btn){btn.textContent='🌿 Masuk';btn.disabled=false;}
+  }
 }
 
 function showAccMenu(){
@@ -867,29 +836,33 @@ function showAccMenu(){
     +'<button id="_aLo" style="width:100%;padding:12px;border-radius:11px;border:none;background:var(--red-bg);color:var(--red);font-size:13px;font-weight:700;cursor:pointer;text-align:left">🚪 Keluar</button>'
     +'</div>';
   document.getElementById('app').appendChild(m);
-  document.getElementById('_aSw').onclick=function(){m.remove();lsRS('bq_user','');lsRS('bq_uid','');CU='';UID='';location.reload();};
-  document.getElementById('_aLo').onclick=function(){if(confirm('Yakin mau keluar?')){m.remove();lsRS('bq_user','');location.reload();}};
+  document.getElementById('_aSw').onclick=function(){m.remove();lsRS('bq_user','');lsRS('bq_uid','');location.reload();};
+  document.getElementById('_aLo').onclick=function(){if(confirm('Yakin mau keluar?')){m.remove();lsRS('bq_user','');lsRS('bq_uid','');location.reload();}};
   m.onclick=function(e){if(e.target===m)m.remove();};
 }
 
 // ── LOAD DATA ─────────────────────────────────────────────
 async function loadData(){
-  plants=ls('bq_p_'+UID,[]); jnls=ls('bq_j_'+UID,[]); fpCache=ls('bq_fp_'+UID,{});
-  // UUIDs used for IDs
+  plants=ls('bq_p_'+CU,[]); jnls=ls('bq_j_'+CU,[]); fpCache=ls('bq_fp_'+CU,{});
+  if(plants.length)pid=Math.max.apply(null,plants.map(function(p){return p.id;}))+1;
+  if(jnls.length)jid=Math.max.apply(null,jnls.map(function(j){return j.id;}))+1;
   renderAll();
   try{
-    var sbP=await sbQ('bq_plants','GET',null,'user_id=eq.'+UID+'&deleted_at=is.null&order=created_at.asc');
-    var sbJ=await sbQ('bq_jnls','GET',null,'user_id=eq.'+UID+'&deleted_at=is.null&order=date.desc');
+    var uid=encodeURIComponent(CUID);
+    var sbP=await sbQ('bq_plants','GET',null,'user_id=eq.'+uid+'&order=created_at.asc');
+    var sbJ=await sbQ('bq_journals','GET',null,'user_id=eq.'+uid+'&order=date.desc');
     if(sbP&&sbP.length){
-      plants=sbP.map(function(r){return{id:r.id,name:r.name,type:r.type,emoji:r.emoji,image:r.image,water:r.water||3,fert:r.fert||14,lastWater:r.last_water,lastFert:r.last_fert,health:r.health||'good',notes:r.notes,added:r.added};});
+      plants=sbP.map(function(r){return{id:parseInt(r.id),name:r.name,type:r.type,emoji:r.emoji,image:r.image,water:r.water_days,fert:r.fert_days,lastWater:r.last_water,lastFert:r.last_fert,health:r.health,notes:r.notes,added:r.added_at};});
+      pid=plants.length?Math.max.apply(null,plants.map(function(p){return p.id;}))+1:1;
     }
     if(sbJ&&sbJ.length){
-      jnls=sbJ.map(function(r){return{id:r.id,plantId:r.plant_id,type:r.type,note:r.note,date:r.date};});
+      jnls=sbJ.map(function(r){return{id:parseInt(r.id),plantId:parseInt(r.plant_id),type:r.type,note:r.note,date:r.date};});
+      jid=jnls.length?Math.max.apply(null,jnls.map(function(j){return j.id;}))+1:1;
     }
-    var sbPh=await sbQ('bq_photos','GET',null,'user_id=eq.'+UID+'&deleted_at=is.null&order=date.desc');
+    var sbPh=await sbQ('bq_photos','GET',null,'user_id=eq.'+uid+'&order=date.desc');
     if(sbPh&&sbPh.length){
       fpCache={};
-      sbPh.forEach(function(p){var pid2=p.plant_id;if(!fpCache[pid2])fpCache[pid2]=[];fpCache[pid2].push({id:p.id,img:p.image,date:p.date});});
+      sbPh.forEach(function(p){var pid2=parseInt(p.plant_id);if(!fpCache[pid2])fpCache[pid2]=[];fpCache[pid2].push({id:p.id,img:p.image,date:p.date});});
     }
     saveL(); renderAll();
   }catch(e){console.warn('Sync err',e);}
@@ -1102,8 +1075,8 @@ async function logCare(id,type){
   var noteText=noteMap[type]||JLBL[type]||type;
   var j={id:jid++,plantId:id,type:type,note:noteText,date:t};
   jnls.push(j);saveL();
-  sbQ('bq_plants','PATCH',{last_water:p.lastWater,last_fert:p.lastFert},'id=eq.'+id+'&user_id=eq.'+UID);
-  sbQ('bq_jnls','POST',{id:crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2),user_id:UID,plant_id:id,type:type,note:noteText,date:t});
+  sbQ('bq_plants','PATCH',{last_water:p.lastWater,last_fert:p.lastFert},'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
+  sbQ('bq_journals','POST',{user_id:CUID,plant_id:id,type:type,note:noteText,date:t});
   toast(toastMsg[type]||'📝 Tercatat!');
   renderJnl();renderHome();
   if(detId===id){
@@ -1230,14 +1203,13 @@ async function savePlant(){
     if(idx>-1){
       if(!addImg)data.image=plants[idx].image;
       plants[idx]=Object.assign({},plants[idx],data);
-      sbQ('bq_plants','PATCH',{name:data.name,type:data.type,emoji:data.emoji,image:data.image,water:data.water,fert:data.fert,notes:data.notes},'id=eq.'+eid+'&user_id=eq.'+UID);
+      sbQ('bq_plants','PATCH',{name:data.name,type:data.type,emoji:data.emoji,image:data.image,water_days:data.water,fert_days:data.fert,notes:data.notes,updated_at:new Date().toISOString()},'id=eq.'+eid+'&user_id=eq.'+encodeURIComponent(CUID));
     }
     toast('✅ Tanaman diupdate!');
   }else{
     var np=Object.assign({id:pid++,health:'good',lastWater:t,lastFert:t,added:t},data);
-    var newId=crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
-    np.id=newId;
-    await sbQ('bq_plants','POST',{id:newId,user_id:UID,name:np.name,type:np.type,emoji:np.emoji,image:np.image,water:np.water,fert:np.fert,last_water:t,last_fert:t,health:'good',notes:np.notes,added:t});
+    var res=await sbQ('bq_plants','POST',{user_id:CUID,name:np.name,type:np.type,emoji:np.emoji,image:np.image,water_days:np.water,fert_days:np.fert,last_water:t,last_fert:t,health:'good',notes:np.notes,added_at:t});
+    if(res&&res[0]){np.id=parseInt(res[0].id);pid=Math.max(pid,np.id+1);}
     plants.push(np);tipIdx++;toast('🌱 Tanaman ditambahkan!');
   }
   saveL();closePSheet();renderHome();renderPlants();
@@ -1260,8 +1232,8 @@ function confirmDel(id){
     plants=plants.filter(function(x){return parseInt(x.id)!==id;});
     jnls=jnls.filter(function(j){return parseInt(j.plantId)!==id;});
     delete fpCache[id];saveL();
-    sbQ('bq_plants','PATCH',{deleted_at:new Date().toISOString()},'id=eq.'+id+'&user_id=eq.'+UID);
-    sbQ('bq_jnls','PATCH',{deleted_at:new Date().toISOString()},'plant_id=eq.'+id+'&user_id=eq.'+UID);
+    sbQ('bq_plants','DELETE',null,'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
+    sbQ('bq_journals','DELETE',null,'plant_id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
     m.remove();closeDetail();renderHome();renderPlants();renderJnl();
     toast('🗑️ Tanaman dihapus');
   };
@@ -1312,15 +1284,14 @@ async function saveTL(){
   fpCache[pid2].unshift(newPh);
   saveL();closeTLSheet();
   setTimeout(function(){openDetail(pid2);toast('📸 Foto disimpan!');},290);
-  var newPhId=crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
-  var res=await sbQ('bq_photos','POST',{id:newPhId,user_id:UID,plant_id:pid2,image:tlImg,date:dt});
+  var res=await sbQ('bq_photos','POST',{user_id:CUID,plant_id:pid2,image:tlImg,date:dt});
   if(res&&res[0]){newPh.id=res[0].id;saveL();}
 }
 function deleteTL(pid2,phId){
   if(!fpCache[pid2])return;
   fpCache[pid2]=fpCache[pid2].filter(function(p){return p.id!=phId;});
   saveL();renderTLGrid(pid2);
-  sbQ('bq_photos','PATCH',{deleted_at:new Date().toISOString()},'id=eq.'+phId+'&user_id=eq.'+UID);
+  sbQ('bq_photos','DELETE',null,'id=eq.'+phId+'&user_id=eq.'+encodeURIComponent(CUID));
   toast('Foto dihapus');
 }
 
@@ -1395,7 +1366,7 @@ function deleteJnl(id){
   document.getElementById('app').appendChild(m);
   document.getElementById('_jdY').onclick=function(){
     jnls=jnls.filter(function(x){return x.id!==id;});saveL();
-    sbQ('bq_jnls','PATCH',{deleted_at:new Date().toISOString()},'id=eq.'+id+'&user_id=eq.'+UID);
+    sbQ('bq_journals','DELETE',null,'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
     m.remove();renderJnl();renderHome();toast('🗑️ Catatan dihapus');
   };
   document.getElementById('_jdN').onclick=function(){m.remove();};
@@ -1411,12 +1382,12 @@ async function saveJnl(){
   if(eid){
     var idx=jnls.findIndex(function(x){return x.id===parseInt(eid);});
     if(idx>-1){jnls[idx].note=note;jnls[idx].date=dt;jnls[idx].plantId=pid2;saveL();
-      sbQ('bq_jnls','PATCH',{note:note,date:dt,plant_id:pid2},'id=eq.'+eid+'&user_id=eq.'+UID);}
+      sbQ('bq_journals','PATCH',{note:note,date:dt,plant_id:pid2},'id=eq.'+eid+'&user_id=eq.'+encodeURIComponent(CUID));}
     toast('✅ Catatan diupdate!');
   }else{
     var j={id:jid++,plantId:pid2,type:'note',note:note,date:dt};
     jnls.push(j);saveL();
-    sbQ('bq_jnls','POST',{id:crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2),user_id:UID,plant_id:pid2,type:'note',note:note,date:dt});
+    sbQ('bq_journals','POST',{user_id:CUID,plant_id:pid2,type:'note',note:note,date:dt});
     toast('📝 Catatan disimpan!');
   }
   closeJSheet();renderJnl();renderHome();
@@ -1496,9 +1467,14 @@ async function doScan(){
   if(!scanImg){toast('Pilih foto dulu!');return;}
   document.getElementById('scanBtnTxt').textContent='⏳ Mengidentifikasi...';
   document.getElementById('scanBtn').disabled=true;
-  document.getElementById('scanResult').innerHTML='<div style="text-align:center;padding:18px;color:var(--muted);font-size:13px">Sedang menganalisis foto...</div>';
+  document.getElementById('scanResult').innerHTML='<div style="text-align:center;padding:18px;color:var(--muted);font-size:13px">🌿 Sedang menganalisis foto...</div>';
   try{
-    var blob=await (await fetch(scanImg)).blob();
+    // Fix: convert base64 data URL → Blob
+    var arr=scanImg.split(','),mime=arr[0].match(/:(.*?);/)[1];
+    var bstr=atob(arr[1]),n=bstr.length,u8=new Uint8Array(n);
+    for(var i=0;i<n;i++)u8[i]=bstr.charCodeAt(i);
+    var blob=new Blob([u8],{type:mime});
+
     var fd=new FormData();fd.append('images',blob,'plant.jpg');fd.append('organs','auto');
     var resp=await fetch('https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=3&lang=id&api-key='+PNKEY,{method:'POST',body:fd});
     var data=await resp.json();
@@ -1514,6 +1490,7 @@ async function doScan(){
     hist.unshift({img:scanImg,name:name,sci:sci,conf:conf,date:today()});
     if(hist.length>10)hist.pop();
     lsS('bq_sh_'+CU,hist);
+    var alts=data.results.slice(1);
     document.getElementById('scanResult').innerHTML=
       '<div style="background:var(--card);border-radius:var(--r);overflow:hidden;border:1.5px solid var(--line);box-shadow:var(--sh)">'
       +'<div style="background:linear-gradient(135deg,var(--green),var(--gm));padding:13px;display:flex;align-items:center;gap:10px">'
@@ -1522,9 +1499,9 @@ async function doScan(){
       +'<div style="flex:1"><div style="color:#fff;font-family:Fraunces,serif;font-size:17px;font-weight:700;margin-bottom:2px">'+name+'</div>'
       +'<div style="color:rgba(255,255,255,.7);font-size:10.5px;font-style:italic">'+sci+'</div></div>'
       +'<div style="background:rgba(255,255,255,.18);border-radius:9px;padding:3px 9px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">'+conf+'%</div></div>'
-      +(data.results.length>1?'<div style="padding:10px 13px"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:7px;letter-spacing:.08em">Kemungkinan Lain</div>'
-        +data.results.slice(1).map(function(r2){var n2=(r2.species.commonNames&&r2.species.commonNames.length)?r2.species.commonNames[0]:r2.species.scientificName;return '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line2)"><div style="font-size:12px;color:var(--text);font-weight:500">'+n2+'</div><span style="font-size:10px;font-weight:700;color:var(--muted)">'+Math.round(r2.score*100)+'%</span></div>';}).join('')+'</div>':'')
-      +'<div style="padding:9px 13px 13px"><button onclick="addFromScan(\''+name+'\',\''+sci+'\')" style="width:100%;padding:10px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gl),var(--green));color:#fff;font-size:13px;font-weight:700;cursor:pointer">➕ Tambah ke Koleksi</button></div></div>';
+      +(alts.length?'<div style="padding:10px 13px"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:7px;letter-spacing:.08em">Kemungkinan Lain</div>'
+        +alts.map(function(r2){var n2=(r2.species.commonNames&&r2.species.commonNames.length)?r2.species.commonNames[0]:r2.species.scientificName;return '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line2)"><div style="font-size:12px;color:var(--text);font-weight:500">'+n2+'<span style="font-size:10px;color:var(--muted);font-style:italic;margin-left:5px">'+r2.species.scientificName+'</span></div><span style="font-size:10px;font-weight:700;color:var(--muted)">'+Math.round(r2.score*100)+'%</span></div>';}).join('')+'</div>':'')
+      +'<div style="padding:9px 13px 13px"><button onclick="addFromScan(this)" data-name="'+name.replace(/"/g,'&quot;')+'" data-sci="'+sci.replace(/"/g,'&quot;')+'" style="width:100%;padding:10px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--gl),var(--green));color:#fff;font-size:13px;font-weight:700;cursor:pointer">➕ Tambah ke Koleksi</button></div></div>';
     renderScanHist();
   }catch(e){
     document.getElementById('scanResult').innerHTML=scanErrCard('Gagal menghubungi server. Periksa koneksi internet.');
@@ -1538,7 +1515,8 @@ function scanErrCard(msg){
     +'<div style="font-size:24px;margin-bottom:6px">😔</div>'
     +'<div style="font-size:13px;font-weight:600;color:var(--red)">'+msg+'</div></div>';
 }
-function addFromScan(name,sci){
+function addFromScan(btn){
+  var name=btn.dataset.name||'',sci=btn.dataset.sci||'';
   addImg=null;
   document.getElementById('pfId').value='';
   document.getElementById('pfName').value=name;
@@ -1705,7 +1683,8 @@ function saveEditType(){
   var savedUser=lsR('bq_user');
   var savedUID=lsR('bq_uid');
   if(savedUser&&savedUser.length>=2&&savedUID){
-    CU=savedUser;UID=savedUID;
+    CU=savedUser;
+    CUID=savedUID;
     document.getElementById('uLabel').textContent=CU;
     document.getElementById('heroGr').textContent='Halo, '+CU+'! 👋';
     document.getElementById('loginScr').classList.add('off');
