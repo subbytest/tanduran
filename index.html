@@ -342,8 +342,13 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
 .lb-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.14);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* ── TOAST ── */
-#toast{position:fixed;bottom:calc(var(--navh)+12px);left:50%;transform:translateX(-50%);max-width:390px;width:calc(100% - 28px);background:var(--green);color:#fff;padding:10px 16px;border-radius:11px;font-size:12.5px;font-weight:600;z-index:9999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.22);animation:tIn .2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-[data-theme="dark"] #toast{background:var(--card);color:var(--gl);border:1px solid var(--line)}
+#toast{position:fixed;bottom:calc(var(--navh)+16px);left:50%;transform:translateX(-50%) translateY(0);max-width:340px;width:calc(100% - 32px);padding:11px 16px;border-radius:14px;font-size:13px;font-weight:600;z-index:9999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.18);transition:opacity .25s,transform .25s;pointer-events:none;text-align:center}
+#toast.t-ok{background:#1a7a45;color:#fff}
+#toast.t-err{background:#c0392b;color:#fff}
+#toast.t-info{background:#2c5282;color:#fff}
+#toast.t-warn{background:#b7791f;color:#fff}
+#toast.t-show{display:block;animation:tIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 @media(max-width:430px){#app{max-width:100%}.fab{right:14px}}
@@ -744,11 +749,15 @@ function typeLabel(id){var t=getTypes().find(function(x){return x.id===id;});ret
 function safeNote(j){if(j.note&&j.note!=='undefined'&&j.note.trim())return j.note;return JLBL[j.type]||'Catatan';}
 
 var _toastTimer;
-function toast(msg,dur){
+function toast(msg,type,dur){
   var el=document.getElementById('toast');
-  el.textContent=msg;el.style.display='block';
+  el.textContent=msg;
+  el.className='t-show '+(type==='e'?'t-err':type==='w'?'t-warn':type==='i'?'t-info':'t-ok');
   clearTimeout(_toastTimer);
-  _toastTimer=setTimeout(function(){el.style.display='none';},dur||2800);
+  _toastTimer=setTimeout(function(){
+    el.style.opacity='0';el.style.transform='translateX(-50%) translateY(10px)';
+    setTimeout(function(){el.className='';el.style.opacity='';el.style.transform='';},250);
+  },dur||2600);
 }
 
 function compressImg(file,maxDim,q){
@@ -794,9 +803,9 @@ function toggleTheme(){
 // ── LOGIN ─────────────────────────────────────────────────
 async function doLogin(){
   var raw=document.getElementById('liInp').value.trim();
-  if(!raw){toast('Isi username dulu!');return;}
+  if(!raw){toast('Isi username dulu!','w');return;}
   var uname=raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').substring(0,20);
-  if(!uname||uname.length<2){toast('Username terlalu pendek!');return;}
+  if(!uname||uname.length<2){toast('Username terlalu pendek!','w');return;}
   var btn=document.getElementById('liBtnLogin');
   if(btn){btn.textContent='Memuat...';btn.disabled=true;}
   try{
@@ -817,7 +826,7 @@ async function doLogin(){
     document.getElementById('loginScr').classList.add('off');
     loadData();
   }catch(e){
-    toast('Gagal login: '+e.message);
+    toast('Gagal login: '+e.message,'e');
     if(btn){btn.textContent='🌿 Masuk';btn.disabled=false;}
   }
 }
@@ -1077,7 +1086,7 @@ async function logCare(id,type){
   jnls.push(j);saveL();
   sbQ('bq_plants','PATCH',{last_water:p.lastWater,last_fert:p.lastFert},'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
   sbQ('bq_journals','POST',{user_id:CUID,plant_id:id,type:type,note:noteText,date:t});
-  toast(toastMsg[type]||'📝 Tercatat!');
+  toast(toastMsg[type]||'📝 Tercatat!','ok');
   renderJnl();renderHome();
   if(detId===id){
     var pj=jnls.filter(function(x){return parseInt(x.plantId)===id;}).sort(function(a,b){return new Date(b.date)-new Date(a.date);});
@@ -1172,9 +1181,9 @@ function pickEmoji(btn,e){
 }
 function onPlantImg(ev){
   var f=ev.target.files[0];if(!f)return;
-  if(f.size>10*1024*1024){toast('Foto max 10MB');return;}
+  if(f.size>10*1024*1024){toast('Foto max 10MB','w');return;}
   compressImg(f,900,.8).then(function(data){
-    if(!data){toast('Gagal memproses foto');return;}
+    if(!data){toast('Gagal memproses foto','e');return;}
     addImg=data;
     document.getElementById('pfPrev').src=data;
     document.getElementById('pfPrev').style.display='block';
@@ -1184,13 +1193,13 @@ function onPlantImg(ev){
 }
 async function savePlant(){
   var name=document.getElementById('pfName').value.trim();
-  if(!name){toast('Nama wajib diisi!');return;}
+  if(!name){toast('Nama wajib diisi!','w');return;}
   var eid=document.getElementById('pfId').value;
   var tv=document.getElementById('pfType').value;
   var type,emoji;
   if(tv==='__new__'){
     var nn=document.getElementById('pfTypeNew').value.trim();
-    if(!nn){toast('Isi nama jenis baru!');return;}
+    if(!nn){toast('Isi nama jenis baru!','w');return;}
     type=nn.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
     emoji=selEmoji;
     var types=getTypes();
@@ -1205,12 +1214,12 @@ async function savePlant(){
       plants[idx]=Object.assign({},plants[idx],data);
       sbQ('bq_plants','PATCH',{name:data.name,type:data.type,emoji:data.emoji,image:data.image,water_days:data.water,fert_days:data.fert,notes:data.notes,updated_at:new Date().toISOString()},'id=eq.'+eid+'&user_id=eq.'+encodeURIComponent(CUID));
     }
-    toast('✅ Tanaman diupdate!');
+    toast('Tanaman berhasil diupdate ✅','ok');
   }else{
     var np=Object.assign({id:pid++,health:'good',lastWater:t,lastFert:t,added:t},data);
     var res=await sbQ('bq_plants','POST',{user_id:CUID,name:np.name,type:np.type,emoji:np.emoji,image:np.image,water_days:np.water,fert_days:np.fert,last_water:t,last_fert:t,health:'good',notes:np.notes,added_at:t});
     if(res&&res[0]){np.id=parseInt(res[0].id);pid=Math.max(pid,np.id+1);}
-    plants.push(np);tipIdx++;toast('🌱 Tanaman ditambahkan!');
+    plants.push(np);tipIdx++;toast('Tanaman berhasil ditambahkan 🌱','ok');
   }
   saveL();closePSheet();renderHome();renderPlants();
 }
@@ -1228,14 +1237,19 @@ function confirmDel(id){
     +'<button id="_delN" style="width:100%;padding:12px;border-radius:11px;border:1.5px solid var(--line);background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted)">Batal</button>'
     +'</div>';
   document.getElementById('app').appendChild(m);
-  document.getElementById('_delY').onclick=function(){
+  document.getElementById('_delY').onclick=async function(){
+    document.getElementById('_delY').disabled=true;
+    document.getElementById('_delY').textContent='Menghapus...';
     plants=plants.filter(function(x){return parseInt(x.id)!==id;});
     jnls=jnls.filter(function(j){return parseInt(j.plantId)!==id;});
     delete fpCache[id];saveL();
-    sbQ('bq_plants','DELETE',null,'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
-    sbQ('bq_journals','DELETE',null,'plant_id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
+    await Promise.all([
+      sbQ('bq_plants','DELETE',null,'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID)),
+      sbQ('bq_journals','DELETE',null,'plant_id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID)),
+      sbQ('bq_photos','DELETE',null,'plant_id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID))
+    ]);
     m.remove();closeDetail();renderHome();renderPlants();renderJnl();
-    toast('🗑️ Tanaman dihapus');
+    toast('Tanaman berhasil dihapus 🗑️','ok');
   };
   document.getElementById('_delN').onclick=function(){m.remove();};
   m.onclick=function(e){if(e.target===m)m.remove();};
@@ -1267,7 +1281,7 @@ function closeTLSheet(){document.getElementById('tlSheet').classList.remove('ope
 function onTLImg(ev){
   var f=ev.target.files[0];if(!f)return;
   compressImg(f,800,.75).then(function(data){
-    if(!data){toast('Gagal memproses foto');return;}
+    if(!data){toast('Gagal memproses foto','e');return;}
     tlImg=data;
     document.getElementById('tlPrev').src=data;
     document.getElementById('tlPrev').style.display='block';
@@ -1276,14 +1290,14 @@ function onTLImg(ev){
   });
 }
 async function saveTL(){
-  if(!tlImg){toast('Pilih foto dulu!');return;}
+  if(!tlImg){toast('Pilih foto dulu!','w');return;}
   var pid2=parseInt(document.getElementById('tlPid').value);
   var dt=document.getElementById('tlDate').value||today();
   if(!fpCache[pid2])fpCache[pid2]=[];
   var newPh={id:'local_'+Date.now(),img:tlImg,date:dt};
   fpCache[pid2].unshift(newPh);
   saveL();closeTLSheet();
-  setTimeout(function(){openDetail(pid2);toast('📸 Foto disimpan!');},290);
+  setTimeout(function(){openDetail(pid2);toast('Foto tersimpan 📸','ok');},290);
   var res=await sbQ('bq_photos','POST',{user_id:CUID,plant_id:pid2,image:tlImg,date:dt});
   if(res&&res[0]){newPh.id=res[0].id;saveL();}
 }
@@ -1292,7 +1306,7 @@ function deleteTL(pid2,phId){
   fpCache[pid2]=fpCache[pid2].filter(function(p){return p.id!=phId;});
   saveL();renderTLGrid(pid2);
   sbQ('bq_photos','DELETE',null,'id=eq.'+phId+'&user_id=eq.'+encodeURIComponent(CUID));
-  toast('Foto dihapus');
+  toast('Foto dihapus 🗑️','ok');
 }
 
 // ── LIGHTBOX ──────────────────────────────────────────────
@@ -1367,7 +1381,7 @@ function deleteJnl(id){
   document.getElementById('_jdY').onclick=function(){
     jnls=jnls.filter(function(x){return x.id!==id;});saveL();
     sbQ('bq_journals','DELETE',null,'id=eq.'+id+'&user_id=eq.'+encodeURIComponent(CUID));
-    m.remove();renderJnl();renderHome();toast('🗑️ Catatan dihapus');
+    m.remove();renderJnl();renderHome();toast('Catatan dihapus 🗑️','ok');
   };
   document.getElementById('_jdN').onclick=function(){m.remove();};
   m.onclick=function(e){if(e.target===m)m.remove();};
@@ -1378,17 +1392,17 @@ async function saveJnl(){
   var pid2=parseInt(document.getElementById('jfPlant').value);
   var note=document.getElementById('jfNote').value.trim();
   var dt=document.getElementById('jfDate').value||today();
-  if(!note){toast('Isi catatan dulu!');return;}
+  if(!note){toast('Isi catatan dulu!','w');return;}
   if(eid){
     var idx=jnls.findIndex(function(x){return x.id===parseInt(eid);});
     if(idx>-1){jnls[idx].note=note;jnls[idx].date=dt;jnls[idx].plantId=pid2;saveL();
       sbQ('bq_journals','PATCH',{note:note,date:dt,plant_id:pid2},'id=eq.'+eid+'&user_id=eq.'+encodeURIComponent(CUID));}
-    toast('✅ Catatan diupdate!');
+    toast('Catatan berhasil diupdate ✅','ok');
   }else{
     var j={id:jid++,plantId:pid2,type:'note',note:note,date:dt};
     jnls.push(j);saveL();
     sbQ('bq_journals','POST',{user_id:CUID,plant_id:pid2,type:'note',note:note,date:dt});
-    toast('📝 Catatan disimpan!');
+    toast('Catatan tersimpan 📝','ok');
   }
   closeJSheet();renderJnl();renderHome();
 }
@@ -1452,7 +1466,7 @@ function triggerCam(){document.getElementById('camFile').click();}
 function onCamFile(ev){
   var f=ev.target.files[0];if(!f)return;
   compressImg(f,1200,.9).then(function(data){
-    if(!data){toast('Gagal memproses foto');return;}
+    if(!data){toast('Gagal memproses foto','e');return;}
     scanImg=data;
     document.getElementById('camThumb').src=data;
     document.getElementById('camThumb').style.display='block';
@@ -1464,7 +1478,7 @@ function onCamFile(ev){
 }
 
 async function doScan(){
-  if(!scanImg){toast('Pilih foto dulu!');return;}
+  if(!scanImg){toast('Pilih foto dulu!','w');return;}
   document.getElementById('scanBtnTxt').textContent='⏳ Mengidentifikasi...';
   document.getElementById('scanBtn').disabled=true;
   document.getElementById('scanResult').innerHTML='<div style="text-align:center;padding:18px;color:var(--muted);font-size:13px">🌿 Sedang menganalisis foto...</div>';
@@ -1628,7 +1642,7 @@ function renderMgtList(){
 function deleteType(id){
   var t=getTypes().find(function(x){return x.id===id;});if(!t)return;
   var usedCount=plants.filter(function(p){return p.type===id;}).length;
-  if(usedCount>0){toast('❌ Masih dipakai '+usedCount+' tanaman!');return;}
+  if(usedCount>0){toast('Masih dipakai '+usedCount+' tanaman!','e');return;}
   var m=document.createElement('div');m.id='_dtMod';
   m.style.cssText='position:absolute;inset:0;background:rgba(10,20,12,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
   m.innerHTML='<div style="background:var(--card);border-radius:20px 20px 0 0;width:100%;padding:22px 18px 38px;text-align:center;border-top:1px solid var(--line)">'
@@ -1641,7 +1655,7 @@ function deleteType(id){
   document.getElementById('app').appendChild(m);
   document.getElementById('_dtY').onclick=function(){
     var types=getTypes().filter(function(x){return x.id!==id;});
-    saveTypes(types);m.remove();renderMgtList();toast('🗑️ Jenis dihapus');
+    saveTypes(types);m.remove();renderMgtList();toast('Jenis dihapus 🗑️','ok');
   };
   document.getElementById('_dtN').onclick=function(){m.remove();};
   m.onclick=function(e){if(e.target===m)m.remove();};
@@ -1666,7 +1680,7 @@ function pickEtEmoji(btn,e){
 function saveEditType(){
   var id=document.getElementById('etId').value;
   var name=document.getElementById('etName').value.trim();
-  if(!name){toast('Isi nama jenis!');return;}
+  if(!name){toast('Isi nama jenis!','w');return;}
   var types=getTypes();
   var idx=types.findIndex(function(x){return x.id===id;});
   if(idx>-1){types[idx].label=name;types[idx].emoji=etSelEmoji;saveTypes(types);}
@@ -1674,7 +1688,7 @@ function saveEditType(){
   plants.forEach(function(p){if(p.type===id){p.emoji=etSelEmoji;}});
   saveL();
   closeEditTypeSheet();renderMgtList();popTypeSelect();
-  toast('✅ Jenis diupdate!');
+  toast('Jenis berhasil diupdate ✅','ok');
 }
 
 // ── INIT ──────────────────────────────────────────────────
