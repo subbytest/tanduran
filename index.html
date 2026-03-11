@@ -48,7 +48,7 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
 #app{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.4)}
 
 /* ── LOGIN ── */
-#loginScr{position:absolute;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;transition:opacity .3s}
+#loginScr{position:absolute;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:max(60px,15vh) 1.5rem 40px;overflow-y:auto;transition:opacity .3s}
 #loginScr.off{opacity:0;pointer-events:none}
 .l-ico{font-size:3.2rem;margin-bottom:.6rem}
 .l-logo{font-family:'Fraunces',serif;font-size:2.4rem;font-weight:700;color:var(--green)}
@@ -364,7 +364,7 @@ button,input,select,textarea{font-family:'Plus Jakarta Sans',sans-serif}
   <div class="l-sub">Plant care, digitalized.</div>
   <div class="l-box">
     <label class="l-lbl">Username kamu</label>
-    <input class="l-inp" id="liInp" type="text" placeholder="Contoh: petani666, kebunku"
+    <input class="l-inp" id="liInp" type="text" autocomplete="off" placeholder="Contoh: petani666, kebunku"
       autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="l-btn" onclick="doLogin()">🌱 Masuk ke Botaniq</button>
@@ -807,7 +807,7 @@ async function doLogin(){
   var uname=raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').substring(0,20);
   if(!uname||uname.length<2){toast('Username terlalu pendek!','w');return;}
   var btn=document.getElementById('liBtnLogin');
-  if(btn){btn.textContent='Memuat...';btn.disabled=true;}
+  if(btn){btn.style.opacity='0.6';btn.disabled=true;}
   try{
     var existing=await sbQ('bq_users','GET',null,'username=eq.'+encodeURIComponent(uname)+'&select=id,username');
     var usr;
