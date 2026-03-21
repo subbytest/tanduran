@@ -569,14 +569,18 @@ loadCats();
 // catInfo: returns {l} for display
 const catInfo=(v,type)=>{
   if(!v||v==='transfer')return{l:v==='transfer'?'Transfer':'—'};
-  // Search primary array first
+  // Search loaded cats first (primary then secondary)
   const primary=type==='in'?IN_CATS:OUT_CATS;
   const found=primary.find(c=>c.v===v);
   if(found&&found.l)return found;
-  // Fallback: search the other array (type mismatch in old data)
   const secondary=type==='in'?OUT_CATS:IN_CATS;
   const found2=secondary.find(c=>c.v===v);
   if(found2&&found2.l)return found2;
+  // Fallback: search DEFAULT cats (always available, tidak tergantung loadCats)
+  const defOut=DEFAULT_OUT_CATS.find(c=>c.v===v);
+  if(defOut)return defOut;
+  const defIn=DEFAULT_IN_CATS.find(c=>c.v===v);
+  if(defIn)return defIn;
   // Last resort: capitalize raw value
   return{l:v.charAt(0).toUpperCase()+v.slice(1).replace(/_/g,' ').replace(/-/g,' ')};
 };
@@ -1661,11 +1665,11 @@ function buildTrxHTML(bulan,username){
     const w=S.wallets.find(x=>x.id===t.wallet_id);
     const color=t.type==='in'?'#059669':'#dc2626';
     const prefix=t.type==='in'?'+':'-';
-    // catLabel: pakai label kategori, fallback ke raw category, fallback ke note singkat, fallback ke tipe
-    let catLabel='—';
+    // catLabel: kategori → raw value → note → tipe transaksi (bukan '—')
+    let catLabel;
     if(ci.l&&ci.l.trim()&&ci.l!=='—')catLabel=ci.l;
     else if(t.category&&t.category.trim())catLabel=t.category.charAt(0).toUpperCase()+t.category.slice(1).replace(/_/g,' ').replace(/-/g,' ');
-    else if(t.note&&t.note.trim())catLabel=t.note.trim();
+    else if(t.note&&t.note.trim())catLabel=t.note.trim().length>20?t.note.trim().slice(0,20)+'…':t.note.trim();
     else catLabel=t.type==='in'?'Pemasukan':'Pengeluaran';
     return`<tr style="border-bottom:1px solid #f4f4f5">
       <td style="padding:10px 12px;font-size:12px;color:#52525b">${fmtDS(t.date)}</td>
