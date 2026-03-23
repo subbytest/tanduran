@@ -110,11 +110,11 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 
 /* tanaman terakhir dilihat — horizontal scroll cards */
 .recent-scroll{display:flex;gap:10px;padding:0 16px 4px;overflow-x:auto}
-.recent-card{background:var(--card);border-radius:14px;padding:0;border:1px solid var(--border);width:100px;text-align:center;cursor:pointer;flex-shrink:0;box-shadow:var(--sh);overflow:hidden}
+.recent-card{background:var(--card);border-radius:14px;padding:10px;border:1px solid var(--border);min-width:90px;text-align:center;cursor:pointer;flex-shrink:0;box-shadow:var(--sh)}
 .recent-card:active{opacity:.8}
-.recent-img{width:100px;height:80px;object-fit:cover;display:block}.recent-emoji{font-size:32px;height:80px;display:flex;align-items:center;justify-content:center;background:var(--gp)}
-.recent-name{font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:5px 6px 1px}
-.recent-status{font-size:9px;margin-top:0;padding:0 6px 6px}
+.recent-emoji{font-size:28px;margin-bottom:5px;display:block}
+.recent-name{font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.recent-status{font-size:9px;margin-top:2px}
 .recent-status.good{color:var(--green)}.recent-status.warn{color:var(--amber)}.recent-status.bad{color:var(--red)}
 
 /* tip card */
@@ -149,7 +149,7 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
 .pcard{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:var(--sh);transition:opacity .15s}
 .pcard:active{opacity:.78}
-.pc-img{height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;overflow:hidden}
+.pc-img{height:110px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;overflow:hidden}
 /* colored backgrounds cycling */
 .pc-img.bg0{background:#e8f5e2}.pc-img.bg1{background:#fef3e2}.pc-img.bg2{background:#fce4ec}.pc-img.bg3{background:#e3f2fd}.pc-img.bg4{background:#f3e5f5}.pc-img.bg5{background:#e0f7fa}
 [data-theme="dark"] .pc-img.bg0{background:rgba(91,184,71,.12)}
@@ -189,7 +189,7 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 #detail.open{transform:translateX(0);pointer-events:all}
 /* hero — screenshot img 3: large emoji on colored bg */
 .d-hero{position:relative;flex-shrink:0;height:200px;display:flex;align-items:center;justify-content:center;font-size:88px;overflow:hidden}
-.d-hero-blur{display:none}
+.d-hero-blur{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(20px) brightness(.5);transform:scale(1.1)}
 .d-hero-img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;padding:12px}
 .d-hero-emoji{font-size:88px;position:relative;z-index:1}
 /* back + share + fav buttons */
@@ -233,14 +233,6 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 .care-log-body{flex:1}
 .care-log-title{font-size:12.5px;font-weight:600;color:var(--text)}
 .care-log-date{font-size:10.5px;color:var(--muted);margin-top:1px}
-.care-pill-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px}
-.care-pill{padding:8px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:.12s}
-.care-pill:active{opacity:.8;transform:scale(.96)}
-.care-pill.water{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(26,95,180,.22)}
-.care-pill.fert{background:var(--gp);color:var(--green);border:1px solid var(--gpb)}
-.care-pill.prune{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-ln)}
-.care-pill.repot{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(122,62,160,.22)}
-.care-pill.note{background:var(--card2);color:var(--text);border:1px solid var(--border)}
 .care-btn-row{display:flex;gap:8px;margin-bottom:12px}
 .care-btn{flex:1;padding:10px;border-radius:11px;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;transition:.12s}
 .care-btn.water{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(26,95,180,.22)}
@@ -590,8 +582,9 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 
 <!-- JURNAL -->
 <div class="scr" id="scr-journal">
-  <div style="padding:14px 16px 4px">
+  <div style="padding:14px 16px 4px;display:flex;justify-content:space-between;align-items:center">
     <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px">Jurnal</div>
+    <button style="width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text)" onclick="openQuickNote(null)">+</button>
   </div>
   <div class="j-tabs">
     <button class="jtab on" id="jtab-care" onclick="setJTab('care',this)">Log Perawatan</button>
@@ -611,7 +604,7 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
     <svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 1 9 9c0 4.17-2.84 7.67-6.72 8.66L12 22l-2.28-2.34C5.84 18.67 3 15.17 3 11A9 9 0 0 1 12 2z"/><path d="M12 2v20"/></svg>
     <span class="ni-lbl">Koleksi</span>
   </button>
-  <button class="nav-fab" id="navFab" onclick="openAddPlant()" style="display:none">＋</button>
+  <button class="nav-fab" id="navFab" onclick="handleNavFab()">＋</button>
   <button class="ni" id="nav-scan" onclick="showScr('scan')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/><path d="M12 2v4"/></svg>
     <span class="ni-lbl">Scan</span>
@@ -669,7 +662,6 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
       </div>
     </div>
     <div class="fg"><label class="fl">Tanggal Tanam</label><input class="fi" type="date" id="pfDate"></div>
-    <div class="fg"><label class="fl">Lokasi</label><input class="fi" id="pfLokasi" placeholder="Contoh: Ruang Tamu, Teras, Balkon..."></div>
     <div class="fg"><label class="fl">Catatan</label><textarea class="fta" id="pfNotes" placeholder="Kondisi khusus, lokasi, dll..."></textarea></div>
     <button class="submt" onclick="savePlant()">💾 Simpan Tanaman</button>
   </div>
@@ -942,7 +934,7 @@ async function loadData(){
     var uid=encodeURIComponent(CUID);
     var sbP=await sbQ('bq_plants','GET',null,'user_id=eq.'+uid+'&order=created_at.asc');
     var sbJ=await sbQ('bq_journals','GET',null,'user_id=eq.'+uid+'&order=date.desc');
-    if(sbP&&sbP.length){plants=sbP.map(function(r){return{id:parseInt(r.id),name:r.name,type:r.type,emoji:r.emoji,image:r.image,water:r.water_days,fert:r.fert_days,lastWater:r.last_water,lastFert:r.last_fert,health:r.health,notes:r.notes,lokasi:r.lokasi||'',added:r.added_at};});pid=plants.length?Math.max.apply(null,plants.map(function(p){return p.id;}))+1:1;}
+    if(sbP&&sbP.length){plants=sbP.map(function(r){return{id:parseInt(r.id),name:r.name,type:r.type,emoji:r.emoji,image:r.image,water:r.water_days,fert:r.fert_days,lastWater:r.last_water,lastFert:r.last_fert,health:r.health,notes:r.notes,added:r.added_at};});pid=plants.length?Math.max.apply(null,plants.map(function(p){return p.id;}))+1:1;}
     if(sbJ&&sbJ.length){jnls=sbJ.map(function(r){return{id:parseInt(r.id),plantId:parseInt(r.plant_id),type:r.type,note:r.note,date:r.date};});jid=jnls.length?Math.max.apply(null,jnls.map(function(j){return j.id;}))+1:1;}
     var sbPh=await sbQ('bq_photos','GET',null,'user_id=eq.'+uid+'&order=date.desc');
     if(sbPh&&sbPh.length){fpCache={};sbPh.forEach(function(p){var pid2=parseInt(p.plant_id);if(!fpCache[pid2])fpCache[pid2]=[];fpCache[pid2].push({id:p.id,img:p.image,date:p.date});});}
@@ -957,8 +949,6 @@ function showScr(n){
   document.querySelectorAll('.ni').forEach(function(b){b.classList.remove('active');});
   var s=document.getElementById('scr-'+n);var b=document.getElementById('nav-'+n);
   if(s)s.classList.add('on');if(b)b.classList.add('active');
-  var fab=document.getElementById('navFab');
-  if(fab){fab.style.display=n==='plants'?'flex':'none';}
   if(n==='home')renderHome();
   if(n==='plants')renderPlants();
   if(n==='journal'){setJTab('care',document.getElementById('jtab-care'));renderJnl();}
@@ -1020,11 +1010,8 @@ function renderHome(){
         var st=healthStatus(p);
         var stTxt=st==='good'?'Sehat':st==='warn'?'Perhatian':'Kritis';
         var em=p.emoji||typeEmoji(p.type)||'🌿';
-        var imgHtml=p.image
-          ?'<img class="recent-img" src="'+p.image+'" alt="">'
-          :'<div class="recent-emoji">'+em+'</div>';
         return '<div class="recent-card" onclick="openDetail('+p.id+')">'
-          +imgHtml
+          +'<span class="recent-emoji">'+(p.image?'<img src="'+p.image+'" style="width:40px;height:40px;border-radius:9px;object-fit:cover" alt="">':em)+'</span>'
           +'<div class="recent-name">'+p.name+'</div>'
           +'<div class="recent-status '+st+'">'+stTxt+'</div>'
           +'</div>';
@@ -1037,20 +1024,7 @@ function renderHome(){
     hg.innerHTML='<div class="remind-item" onclick="openAddPlant()" style="justify-content:center;border-style:dashed;cursor:pointer"><span style="font-size:22px;color:var(--green)">＋</span><span style="font-size:13px;font-weight:700;color:var(--green);margin-left:6px">Tambah Tanaman Pertama</span></div>';
     return;
   }
-  // render recent list di home
-  hg.innerHTML=plants.slice(0,4).map(function(p){
-    var st=healthStatus(p);var sc=healthScore(p);
-    var wdays=daysUntil(dueDate(p.lastWater,p.water));
-    var badgeLabel=wdays<0?Math.abs(wdays)+' hr telat':wdays===0?'Hari ini':wdays+' hr lagi';
-    var em=p.emoji||typeEmoji(p.type)||'🌿';
-    var icoHtml=p.image?'<img src="'+p.image+'" alt="" style="width:100%;height:100%;object-fit:cover">':em;
-    return '<div class="hlist-item" onclick="openDetail('+p.id+')">'
-      +'<div class="hlist-ico">'+icoHtml+'</div>'
-      +'<div class="hlist-info"><div class="hlist-name">'+p.name+'</div><div class="hlist-sub">'+typeLabel(p.type)+'</div>'
-      +'<div class="hlist-prog"><div class="hlist-progf '+st+'" style="width:'+sc+'%"></div></div></div>'
-      +'<div class="hlist-badge '+st+'">'+badgeLabel+'</div></div>';
-  }).join('')
-  +(plants.length>4?'<div style="text-align:center;padding:8px 0;font-size:11px;color:var(--green);font-weight:700;cursor:pointer" onclick="showScr(\'plants\')">Lihat '+(plants.length-4)+' lainnya →</div>':'');
+  hg.innerHTML='';
 }
 
 function cardHtml(p){
@@ -1115,7 +1089,7 @@ function renderDBody(id){
     +'<div class="info-tile"><div class="info-tile-lbl">Jenis</div><div class="info-tile-val">'+typeLabel(p.type)+'</div></div>'
     +'<div class="info-tile"><div class="info-tile-lbl">Media Tanam</div><div class="info-tile-val">'+ci.soil+'</div></div>'
     +'<div class="info-tile"><div class="info-tile-lbl">Ukuran Pot</div><div class="info-tile-val">25cm / Pot 3</div></div>'
-    +'<div class="info-tile"><div class="info-tile-lbl">Lokasi</div><div class="info-tile-val">'+(p.lokasi||'—')+'</div></div>'
+    +'<div class="info-tile"><div class="info-tile-lbl">Lokasi</div><div class="info-tile-val">Ruang Tamu</div></div>'
     +'<div class="info-tile"><div class="info-tile-lbl">Status</div><div class="info-tile-val '+bcls+'">'+stTxt+'</div></div>'
     +'</div>'
     +'<div class="kdb-section"><div class="kdb-title">Kebutuhan Dasar</div>'
@@ -1123,20 +1097,16 @@ function renderDBody(id){
     +'<div class="kdb-item"><div class="kdb-ico sun">☀️</div><div class="kdb-txt">'+ci.light+'</div></div>'
     +'<div class="kdb-item"><div class="kdb-ico" style="background:var(--gp);border:1px solid var(--gpb)">🌡️</div><div class="kdb-txt">Suhu ideal '+ci.temp+'</div></div>'
     +'</div>';
-  var catatanTab='<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Catatan Tanaman</div>'
-    +'<div class="d-notes-box">'+(p.notes||'<span style="color:var(--muted);font-style:italic">Belum ada catatan. Tap ⋯ → Edit untuk mengisi.</span>')+'</div>'
+  var catatanTab='<div class="d-notes-box">'+(p.notes||'<span style="color:var(--muted);font-style:italic">Belum ada catatan. Tap ⋯ untuk edit.</span>')+'</div>'
     +'<div class="d-sec-t" style="margin-top:12px;margin-bottom:6px">Foto Progres</div>'
     +'<div class="tl-grid" id="tlG_'+id+'"></div>';
   var siramTitle=wdays<0?'Terlambat '+Math.abs(wdays)+' hari':wdays===0?'Siram hari ini':'Siram dalam '+wdays+' hari';
-  var perawatanTab='<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Catat Perawatan</div>'
-    +'<div class="care-pill-row">'
-    +'<button class="care-pill water" onclick="logCare('+id+',\'water\')">💧 Siram</button>'
-    +'<button class="care-pill fert" onclick="logCare('+id+',\'fert\')">🌱 Pupuk</button>'
-    +'<button class="care-pill prune" onclick="logCare('+id+',\'prune\')">✂️ Pangkas</button>'
-    +'<button class="care-pill repot" onclick="logCare('+id+',\'repot\')">🪴 Repot</button>'
-    +'<button class="care-pill note" onclick="openQuickNote('+id+')">📝 Catatan</button>'
+  var perawatanTab='<div class="care-btn-row">'
+    +'<button class="care-btn water" onclick="logCare('+id+',\'water\')">💧 Siram</button>'
+    +'<button class="care-btn fert" onclick="logCare('+id+',\'fert\')">🌱 Pupuk</button>'
+    +'<button class="care-btn prune" onclick="logCare('+id+',\'prune\')">✂️ Pangkas</button>'
     +'</div>'
-    +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;margin-top:14px">Log Perawatan</div>'
+    +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Log Perawatan</div>'
     +'<div id="mj_'+id+'">'
     +(pj.length?pj.slice(0,5).map(mjiHtml).join('')+(pj.length>5?'<button class="more-btn" onclick="showAllMji('+id+')">Lihat '+(pj.length-5)+' lainnya →</button>':''):'<div class="rw-empty">Belum ada riwayat perawatan.</div>')
     +'</div>';
@@ -1226,7 +1196,7 @@ function popPlantSel(sel){
 // ── PLANT CRUD ──
 function openAddPlant(){
   addImg=null;document.getElementById('pfId').value='';document.getElementById('pfName').value='';
-  document.getElementById('pfNotes').value='';document.getElementById('pfLokasi').value='';document.getElementById('pfPrev').style.display='none';
+  document.getElementById('pfNotes').value='';document.getElementById('pfPrev').style.display='none';
   document.getElementById('pfIco').style.display='block';document.getElementById('pfTxt').style.display='block';
   document.getElementById('pfWater').value='14';document.getElementById('pfDate').value=today().slice(0,10);
   document.getElementById('pShTitle').textContent='Tambah Tanaman';
@@ -1236,7 +1206,7 @@ function openAddPlant(){
 function editPlant(id){
   var p=plants.find(function(x){return x.id===id;});if(!p)return;
   addImg=p.image||null;document.getElementById('pfId').value=id;document.getElementById('pfName').value=p.name;
-  document.getElementById('pfNotes').value=p.notes||'';document.getElementById('pfWater').value=p.water;document.getElementById('pfLokasi').value=p.lokasi||'';
+  document.getElementById('pfNotes').value=p.notes||'';document.getElementById('pfWater').value=p.water;
   document.getElementById('pfDate').value=p.added?p.added.slice(0,10):today().slice(0,10);
   document.getElementById('pShTitle').textContent='Edit Tanaman';popTypeSelect();
   document.getElementById('pfType').value=p.type;document.getElementById('newTypeWrap').style.display='none';
@@ -1262,9 +1232,9 @@ async function savePlant(){
   if(tv==='__new__'){var nn=document.getElementById('pfTypeNew').value.trim();if(!nn){toast('Isi nama jenis baru!','w');return;}type=nn.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');emoji=selEmoji;var types=getTypes();if(!types.find(function(t){return t.id===type;})){types.splice(types.length-1,0,{id:type,label:nn,emoji:emoji});saveTypes(types);}}
   else{type=tv;emoji=typeEmoji(type);}
   var dateVal=document.getElementById('pfDate').value;var addedAt=dateVal?new Date(dateVal).toISOString():today();
-  var data={name:name,type:type,emoji:emoji,water:parseInt(document.getElementById('pfWater').value),fert:90,notes:document.getElementById('pfNotes').value.trim(),lokasi:document.getElementById('pfLokasi').value.trim()||'Ruang Tamu',image:addImg,added:addedAt};
-  if(eid){var idx=plants.findIndex(function(p){return p.id===parseInt(eid);});if(idx>-1){if(!addImg)data.image=plants[idx].image;plants[idx]=Object.assign({},plants[idx],data);sbQ('bq_plants','PATCH',{name:data.name,type:data.type,emoji:data.emoji,image:data.image,water_days:data.water,notes:data.notes,lokasi:data.lokasi||'',updated_at:new Date().toISOString()},'id=eq.'+eid+'&user_id=eq.'+encodeURIComponent(CUID));}toast('Tanaman berhasil diupdate ✅','ok');}
-  else{var t=today();var np=Object.assign({id:pid++,health:'good',lastWater:t,lastFert:t,added:addedAt},data);var res=await sbQ('bq_plants','POST',{user_id:CUID,name:np.name,type:np.type,emoji:np.emoji,image:np.image,water_days:np.water,fert_days:90,last_water:t,last_fert:t,health:'good',notes:np.notes,lokasi:np.lokasi||'',added_at:addedAt});if(res&&res[0]){np.id=parseInt(res[0].id);pid=Math.max(pid,np.id+1);}plants.push(np);tipIdx++;toast('Tanaman berhasil ditambahkan 🌱','ok');}
+  var data={name:name,type:type,emoji:emoji,water:parseInt(document.getElementById('pfWater').value),fert:90,notes:document.getElementById('pfNotes').value.trim(),image:addImg,added:addedAt};
+  if(eid){var idx=plants.findIndex(function(p){return p.id===parseInt(eid);});if(idx>-1){if(!addImg)data.image=plants[idx].image;plants[idx]=Object.assign({},plants[idx],data);sbQ('bq_plants','PATCH',{name:data.name,type:data.type,emoji:data.emoji,image:data.image,water_days:data.water,notes:data.notes,updated_at:new Date().toISOString()},'id=eq.'+eid+'&user_id=eq.'+encodeURIComponent(CUID));}toast('Tanaman berhasil diupdate ✅','ok');}
+  else{var t=today();var np=Object.assign({id:pid++,health:'good',lastWater:t,lastFert:t,added:addedAt},data);var res=await sbQ('bq_plants','POST',{user_id:CUID,name:np.name,type:np.type,emoji:np.emoji,image:np.image,water_days:np.water,fert_days:90,last_water:t,last_fert:t,health:'good',notes:np.notes,added_at:addedAt});if(res&&res[0]){np.id=parseInt(res[0].id);pid=Math.max(pid,np.id+1);}plants.push(np);tipIdx++;toast('Tanaman berhasil ditambahkan 🌱','ok');}
   saveL();closePSheet();renderHome();renderPlants();
 }
 function confirmDel(id){
@@ -1413,24 +1383,10 @@ function addFromScan(btn){
   var name=btn.dataset.name||'',sci=btn.dataset.sci||'';addImg=null;document.getElementById('pfId').value='';document.getElementById('pfName').value=name;document.getElementById('pfNotes').value='Nama ilmiah: '+sci;document.getElementById('pfPrev').style.display='none';document.getElementById('pfIco').style.display='block';document.getElementById('pfTxt').style.display='block';document.getElementById('pfWater').value='14';document.getElementById('pfDate').value=today().slice(0,10);document.getElementById('pShTitle').textContent='Tambah Tanaman';
   popTypeSelect();document.getElementById('newTypeWrap').style.display='none';document.getElementById('pSheet').classList.add('open');
 }
-
-function deleteScanHist(idx){
-  var hist=ls('bq_sh_'+CU,[])||[];
-  hist.splice(idx,1);
-  lsS('bq_sh_'+CU,hist);
-  renderScanHist();
-}
 function renderScanHist(){
   var hist=ls('bq_sh_'+CU,[])||[];var el=document.getElementById('scanHist');if(!el)return;
   if(!hist.length){el.innerHTML='<div style="font-size:11px;color:var(--muted);text-align:center;padding:12px 0">Belum ada riwayat scan</div>';return;}
-  el.innerHTML=hist.slice(0,5).map(function(h,i){
-    return '<div class="scan-hist-item"><img class="shi-img" src="'+(h.img||'')+'" alt="">'
-      +'<div style="flex:1;min-width:0"><div class="shi-name">'+h.name+'</div><div class="shi-conf">'+h.sci+' · '+h.conf+'%</div></div>'
-      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
-      +'<div class="shi-dt">'+fmtShort(h.date)+'</div>'
-      +'<button onclick="deleteScanHist('+i+')" style="font-size:9px;color:var(--red);background:none;border:none;cursor:pointer;font-family:Nunito,sans-serif;padding:0">Hapus</button>'
-      +'</div></div>';
-  }).join('');
+  el.innerHTML=hist.slice(0,5).map(function(h){return '<div class="scan-hist-item"><img class="shi-img" src="'+(h.img||'')+'" alt=""><div style="flex:1;min-width:0"><div class="shi-name">'+h.name+'</div><div class="shi-conf">'+h.sci+' · '+h.conf+'%</div></div><div class="shi-dt">'+fmtShort(h.date)+'</div></div>';}).join('');
 }
 
 // ── CHECK ──
