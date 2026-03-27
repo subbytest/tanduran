@@ -992,6 +992,18 @@ async function loadData(){
         fpCache[p.plant_id].push({id:p.id,img:p.image,date:p.date});
       });
       saveL();renderAll();
+      // Sync custom types dari server
+      sbQ('bq_usermeta','GET',null,'user_id=eq.'+uid+'&meta_key=eq.plant_types').then(function(res){
+        if(res&&res.length&&res[0].meta_value){
+          try{
+            var serverTypes=JSON.parse(res[0].meta_value);
+            if(serverTypes&&serverTypes.length){
+              lsS('bq_types_'+CU,serverTypes);
+              renderPlants();renderHome();
+            }
+          }catch(e){}
+        }
+      });
       synced=true;
       break;
     }catch(e){
@@ -1210,7 +1222,7 @@ function updateFabVisibility(screenId){
 
 function showDMenu(){
   var ex=document.getElementById('_dMenu');if(ex){ex.remove();return;}
-  var did=parseInt(detId);
+  var did=detId;
   var m=document.createElement('div');m.id='_dMenu';
   m.style.cssText='position:absolute;inset:0;z-index:9990;pointer-events:all';
   var inner=document.createElement('div');
@@ -1251,7 +1263,7 @@ function openQuickNote(plantId){
 }
 function popPlantSel(sel){
   document.getElementById('jfPlant').innerHTML=plants.map(function(p){
-    return '<option value="'+p.id+'"'+(p.id===parseInt(sel)?' selected':'')+'>'+p.name+'</option>';
+    return '<option value="'+p.id+'"'+(String(p.id)===String(sel)?' selected':'')+'>'+p.name+'</option>';
   }).join('');
 }
 
@@ -1280,7 +1292,7 @@ function closePSheet(){document.getElementById('pSheet').classList.remove('open'
 function popTypeSelect(){
   document.getElementById('pfType').innerHTML=getTypes().map(function(t){return '<option value="'+t.id+'">'+t.label+'</option>';}).join('')+'<option value="__new__">+ Tambah jenis baru...</option>';
 }
-function onTypeChange(){var v=document.getElementById('pfType').value;document.getElementById('newTypeWrap').style.display=v==='__new__'?'block':'none';if(v==='__new__')buildEmojiPicker();}
+function onTypeChange(){var v=document.getElementById('pfType').value;document.getElementById('newTypeWrap').style.display=v==='__new__'?'block':'none';}
 function buildEmojiPicker(){selEmoji='🌿';document.getElementById('emojiRow').innerHTML=EMOJIS.map(function(e){return '<button class="emoji-opt'+(e==='🌿'?' on':'')+'" onclick="pickEmoji(this,\''+e+'\')" type="button">'+e+'</button>';}).join('');}
 function pickEmoji(btn,e){document.querySelectorAll('.emoji-opt').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');selEmoji=e;}
 function onPlantImg(ev){
@@ -1548,7 +1560,7 @@ function renderMgtList(){
 function deleteType(id){
   var t=getTypes().find(function(x){return x.id===id;});if(!t)return;var usedCount=plants.filter(function(p){return p.type===id;}).length;if(usedCount>0){toast('Masih dipakai '+usedCount+' tanaman!','e');return;}
   var m=document.createElement('div');m.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
-  m.innerHTML='<div style="background:var(--card);border-radius:18px 18px 0 0;width:100%;padding:22px 18px 38px;text-align:center;border-top:1px solid var(--border)"><div style="font-size:30px;margin-bottom:7px">'+t.emoji+'</div><div style="font-family:Fraunces,serif;font-size:17px;color:var(--text);margin-bottom:5px;font-weight:700">Hapus "'+t.label+'"?</div><div style="font-size:12px;color:var(--muted);margin-bottom:18px">Jenis ini belum dipakai tanaman manapun.</div><button id="_dtY" style="width:100%;padding:12px;border-radius:11px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:7px">Ya, Hapus</button><button id="_dtN" style="width:100%;padding:12px;border-radius:11px;border:1px solid var(--border);background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted)">Batal</button></div>';
+  m.innerHTML='<div style="background:var(--card);border-radius:18px 18px 0 0;width:100%;padding:22px 18px 38px;text-align:center;border-top:1px solid var(--border)"><div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:5px">Hapus "'+t.label+'"?</div><div style="font-size:12px;color:var(--muted);margin-bottom:18px">Jenis ini belum dipakai tanaman manapun.</div><button id="_dtY" style="width:100%;padding:12px;border-radius:11px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:7px">Ya, Hapus</button><button id="_dtN" style="width:100%;padding:12px;border-radius:11px;border:1px solid var(--border);background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted)">Batal</button></div>';
   document.getElementById('app').appendChild(m);
   document.getElementById('_dtY').onclick=function(){var types=getTypes().filter(function(x){return x.id!==id;});saveTypes(types);m.remove();renderMgtList();toast('Jenis dihapus 🗑️','ok');};
   document.getElementById('_dtN').onclick=function(){m.remove();};m.onclick=function(e){if(e.target===m)m.remove();};
