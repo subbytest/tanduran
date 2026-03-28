@@ -80,8 +80,10 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 /* kebun card */
 .kebun-card{margin:8px 16px;background:var(--gp);border-radius:16px;padding:11px 14px;border:1px solid var(--gpb);position:relative;overflow:hidden;flex-shrink:0}
 .kebun-card::after{content:'';position:absolute;right:-12px;top:-12px;width:64px;height:64px;border-radius:50%;background:var(--gpb)}
-.kebun-title{font-size:12px;font-weight:700;color:var(--green);margin-bottom:1px}
-.kebun-sub{font-size:10px;color:var(--green);opacity:.7;margin-bottom:7px}
+.kebun-title{font-size:13px;font-weight:800;color:var(--green);margin-bottom:4px;letter-spacing:-.2px}
+.kebun-pills{display:flex;align-items:center;gap:5px}
+.kebun-pill{font-size:10px;font-weight:600;color:var(--green);opacity:.85}
+.kebun-pill-sep{font-size:10px;color:var(--green);opacity:.4}
 .kebun-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
 .kstat{background:rgba(255,255,255,.6);border-radius:9px;padding:6px 4px;text-align:center}
 [data-theme="dark"] .kstat{background:rgba(255,255,255,.08)}
@@ -506,26 +508,28 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 <div class="scr on" id="scr-home">
   <!-- kebun card -->
   <div class="kebun-card" id="kebunCard">
-    <div class="kebun-title" id="kebunTitle">Kebun Digital-mu</div>
-    <div class="kebun-sub" id="kebunSub">0 tanaman</div>
-    <div class="kebun-stats" id="kebunStats">
-      <div class="kstat"><div class="kstat-n" id="kstatSehat">0</div><div class="kstat-l">Sehat</div></div>
-      <div class="kstat"><div class="kstat-n warn" id="kstatPerhatian">0</div><div class="kstat-l warn">Perhatian</div></div>
-      <div class="kstat"><div class="kstat-n bad" id="kstatKritis">0</div><div class="kstat-l bad">Kritis</div></div>
+    <div class="kebun-title">Kebun Digital-mu</div>
+    <div class="kebun-stats" id="kebunStats" style="margin-top:9px">
+      <div class="kstat"><div class="kstat-n" id="kstatSehat">0</div><div class="kstat-l">Tanaman</div></div>
+      <div class="kstat"><div class="kstat-n warn" id="kstatPerhatian">0</div><div class="kstat-l warn">Jenis</div></div>
+      <div class="kstat"><div class="kstat-n bad" id="kstatKritis">0</div><div class="kstat-l bad">Perhatian</div></div>
     </div>
   </div>
   <div id="homeAlertWrap"></div>
-  <!-- tip -->
-  <div class="tip-card">
+  <!-- pengingat -->
+  <div class="home-sec" id="homeTindakan" style="display:none">
+    <div class="sec-hd">
+      <span class="sec-title">🔔 Pengingat Hari Ini</span>
+      <button class="see-all" onclick="dismissReminder()" style="color:var(--muted);font-weight:600">Tutup ✕</button>
+    </div>
+    <div id="homeTindakanList"></div>
+  </div>
+  <!-- tip sesuai jenis koleksi -->
+  <div class="tip-card" id="tipCard">
     <div class="tip-ico" id="tipIco"></div>
     <div><div class="tip-title" id="tipT">Tips Hari Ini</div><div class="tip-body" id="tipB">Memuat</div></div>
   </div>
-  <!-- pengingat -->
-  <div class="home-sec" id="homeTindakan" style="display:none">
-    <div class="sec-hd"><span class="sec-title">🔔 Pengingat Hari Ini</span></div>
-    <div id="homeTindakanList"></div>
-  </div>
-  <!-- tanaman terakhir -->
+  <!-- tanaman terbaru -->
   <div class="home-sec">
     <div class="sec-hd"><span class="sec-title">🌿 Tanaman Terbaru</span><button class="see-all" onclick="showScr('plants')">Lihat semua →</button></div>
   </div>
@@ -1057,68 +1061,124 @@ function showScr(n){
   if(n==='journal'){setJTab('care',document.getElementById('jtab-care'));renderJnl();}
   if(n==='scan')resetScan();
 }
+function dismissReminder(){lsRS('td_remind_dismissed_'+CU,today());var el=document.getElementById('homeTindakan');if(el)el.style.display='none';}
 function renderAll(){renderHome();renderPlants();renderJnl();renderScanHist();renderSymptoms();}
 
 // ── BERANDA ──
+// Tips per jenis tanaman — real-time berdasarkan koleksi
+var TIPS_BY_TYPE={
+  kaktus:[
+    {i:'🌵',t:'Tips Kaktus',b:'Tunggu tanah kering sempurna sebelum menyiram. Kaktus jauh lebih tahan kering daripada basah.'},
+    {i:'☀️',t:'Kaktus & Cahaya',b:'Kaktus butuh minimal 6 jam sinar matahari langsung per hari agar tumbuh proporsional.'}
+  ],
+  lithops:[
+    {i:'🪨',t:'Tips Lithops',b:'Hampir tidak perlu air saat masa istirahat. Overwatering adalah musuh utama lithops.'},
+    {i:'🌞',t:'Lithops & Musim',b:'Saat daun lama mengering (masa pergantian), stop siram total hingga daun baru muncul penuh.'}
+  ],
+  sukulen:[
+    {i:'🪴',t:'Tips Sukulen',b:'Media harus cepat kering. Siram ketika daun mulai sedikit keriput atau terasa lebih ringan.'},
+    {i:'💡',t:'Sukulen Indoor',b:'Sukulen indoor butuh rotasi tiap minggu agar tidak etiolasi dan tetap kompak.'}
+  ],
+  bonsai:[
+    {i:'🌳',t:'Tips Bonsai',b:'Sinar matahari 4–6 jam/hari. Putar pot tiap minggu agar tumbuh seimbang dan proporsional.'},
+    {i:'✂️',t:'Pemangkasan Bonsai',b:'Pangkas tunas baru secara rutin agar siluet tetap terjaga dan energi fokus ke cabang utama.'}
+  ],
+  anggrek:[
+    {i:'🌸',t:'Tips Anggrek',b:'Kelembaban tinggi sangat penting. Siram di pagi hari agar akar kering sebelum malam tiba.'},
+    {i:'🌬️',t:'Anggrek & Udara',b:'Anggrek butuh sirkulasi udara baik. Hindari meletakkan di sudut tertutup tanpa angin.'}
+  ],
+  buah:[
+    {i:'🍋',t:'Tanaman Buah',b:'Pemupukan rutin dengan NPK seimbang dan kalium tinggi mendorong bunga dan buah yang lebih lebat.'},
+    {i:'🌻',t:'Buah & Cahaya',b:'Tanaman buah butuh full sun 6+ jam. Kurang cahaya = pertumbuhan vegetatif berlebih, buah minim.'}
+  ],
+  herbal:[
+    {i:'🌾',t:'Tips Herbal',b:'Panen daun secara rutin justru mendorong pertumbuhan lebih lebat. Jangan biarkan berbunga terlalu awal.'},
+    {i:'💧',t:'Herbal & Siram',b:'Siram herbal di pagi hari. Tanah lembab konsisten tapi tidak tergenang agar aroma tetap kuat.'}
+  ],
+  hias:[
+    {i:'🍃',t:'Membersihkan Daun',b:'Lap daun tanaman hias dengan kain lembab agar fotosintesis optimal dan bebas dari debu & hama.'},
+    {i:'🌿',t:'Tanaman Hias Indoor',b:'Putar pot tiap 2 minggu agar semua sisi tanaman mendapat cahaya merata.'}
+  ]
+};
+var TIPS_GENERAL=[
+  {i:'💧',t:'Cara Menyiram',b:'Siram di pangkal tanaman, bukan dari atas daun. Pastikan drainase pot berjalan lancar.'},
+  {i:'☀️',t:'Cahaya Optimal',b:'Kenali kebutuhan cahaya tiap tanaman. Terlalu gelap memicu etiolasi — batang jadi panjang & lemah.'},
+  {i:'🌱',t:'Repotting',b:'Ganti pot saat akar sudah keluar dari lubang drainase atau tanah mengering sangat cepat.'},
+  {i:'🍃',t:'Membersihkan Daun',b:'Lap daun dengan kain lembab agar fotosintesis optimal dan tanaman terbebas dari debu & hama.'}
+];
+function getSmartTip(){
+  // Ambil jenis yang ada di koleksi, pilih tips relevan
+  var typeIds=[...new Set(plants.map(function(p){return p.type;}))].filter(Boolean);
+  if(!typeIds.length)return TIPS_GENERAL[tipIdx%TIPS_GENERAL.length];
+  // Rotasi: tiap siklus tipIdx pilih dari jenis berbeda
+  var pooled=[];
+  typeIds.forEach(function(tid){
+    var arr=TIPS_BY_TYPE[tid];
+    if(arr)pooled=pooled.concat(arr);
+  });
+  if(!pooled.length)return TIPS_GENERAL[tipIdx%TIPS_GENERAL.length];
+  return pooled[tipIdx%pooled.length];
+}
+
 function renderHome(){
-  var types={};plants.forEach(function(p){if(p.type)types[p.type]=true;});
-  // kebun card
-  var sehat=plants.filter(function(p){return healthStatus(p)==='good';}).length;
-  var warn=plants.filter(function(p){return healthStatus(p)==='warn';}).length;
-  var kritis=plants.filter(function(p){return healthStatus(p)==='bad';}).length;
-  var kt=document.getElementById('kebunTitle');if(kt)kt.textContent='Kebun Digital-mu';
-  var ks=document.getElementById('kebunSub');if(ks)ks.textContent=plants.length+' tanaman'+(warn+kritis>0?' · '+(warn+kritis)+' perlu perhatian':'');
-  var ksSehat=document.getElementById('kstatSehat');if(ksSehat)ksSehat.textContent=sehat;
-  var ksWarn=document.getElementById('kstatPerhatian');if(ksWarn)ksWarn.textContent=warn;
-  var ksKritis=document.getElementById('kstatKritis');if(ksKritis)ksKritis.textContent=kritis;
-  // alert
+  // kebun card stats: tanaman / jenis / perhatian
+  var typeIds=[...new Set(plants.map(function(p){return p.type;}))].filter(Boolean);
+  var jmlJenis=typeIds.length;
+  var warn=plants.filter(function(p){return healthStatus(p)!=='good';}).length;
+  var ksSehat=document.getElementById('kstatSehat');if(ksSehat)ksSehat.textContent=plants.length;
+  var ksWarn=document.getElementById('kstatPerhatian');if(ksWarn)ksWarn.textContent=jmlJenis;
+  var ksKritis=document.getElementById('kstatKritis');if(ksKritis)ksKritis.textContent=warn;
+  // alert strip
   var aw=document.getElementById('homeAlertWrap');
   var kritisP=plants.filter(function(p){return healthStatus(p)==='bad';});
   var urgentP=plants.filter(function(p){return healthStatus(p)!=='good';});
   if(aw){
-    if(kritisP.length>0){aw.innerHTML='<div class="alert-strip bad" onclick="showScr(\'plants\')" style="margin:0 16px 10px"><div class="alert-dot bad"></div><div class="alert-txt bad">'+kritisP.length+' tanaman kritis — segera siram!</div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></div>';}
-    else if(urgentP.length>0){aw.innerHTML='<div class="alert-strip warn" onclick="showScr(\'plants\')" style="margin:0 16px 10px"><div class="alert-dot warn"></div><div class="alert-txt warn">'+urgentP.length+' tanaman perlu disiram hari ini</div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></div>';}
+    if(kritisP.length>0){aw.innerHTML='<div class="alert-strip bad" onclick="showScr(\'plants\')" style="margin:0 16px 8px"><div class="alert-dot bad"></div><div class="alert-txt bad">'+kritisP.length+' tanaman kritis — segera siram!</div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></div>';}
+    else if(urgentP.length>0){aw.innerHTML='<div class="alert-strip warn" onclick="showScr(\'plants\')" style="margin:0 16px 8px"><div class="alert-dot warn"></div><div class="alert-txt warn">'+urgentP.length+' tanaman perlu disiram hari ini</div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></div>';}
     else aw.innerHTML='';
   }
-  // tip
-  var tip=TIPS[tipIdx%TIPS.length];
-  document.getElementById('tipIco').textContent=tip.i;
-  document.getElementById('tipT').textContent=tip.t;
-  document.getElementById('tipB').textContent=tip.b;
-  // tindakan (pengingat)
+  // pengingat — bisa dismiss, kalau sudah dismiss hari ini tidak tampil sama sekali
+  var dismissedDate=lsR('td_remind_dismissed_'+CU);
+  var dismissedToday=dismissedDate===today();
   var needAction=plants.filter(function(p){return healthStatus(p)!=='good';}).sort(function(a,b){return healthScore(a)-healthScore(b);});
   var htEl=document.getElementById('homeTindakan');var htList=document.getElementById('homeTindakanList');
-  if(needAction.length&&htEl&&htList){
-    htEl.style.display='block';
-    htList.innerHTML=needAction.slice(0,3).map(function(p){
-      var st=healthStatus(p);var isBad=st==='bad';
-      var wdays=daysUntil(dueDate(p.lastWater,p.water));
-      var sub='Jadwal rutin · Tiap '+p.water+' hari';
-      var badgeTxt=isBad?'Terlambat':'Besok';if(wdays===0)badgeTxt='Hari Ini';
-      var badgeCls=isBad?'late':wdays===0?'today':'tmrw';
-      var em=p.emoji||typeEmoji(p.type)||'🌿';
-      return '<div class="remind-item"><div class="remind-left"><div class="remind-dot '+(isBad?'bad':wdays===0?'warn':'good')+'"></div><div><div class="remind-name">'+p.name+'</div><div class="remind-sub">'+sub+'</div></div></div><div class="remind-badge '+badgeCls+'">'+badgeTxt+'</div></div>';
-    }).join('');
-  }else if(htEl){
-    htEl.style.display='block';
-    if(htList)htList.innerHTML='<div style="background:var(--card);border-radius:12px;padding:12px 14px;border:1px solid var(--border);text-align:center;color:var(--muted);font-size:12px;font-style:italic">✅ Tidak ada pengingat hari ini</div>';
+  if(htEl){
+    if(dismissedToday||!needAction.length){
+      htEl.style.display='none';
+    } else {
+      htEl.style.display='block';
+      htList.innerHTML=needAction.slice(0,3).map(function(p){
+        var st=healthStatus(p);var isBad=st==='bad';
+        var wdays=daysUntil(dueDate(p.lastWater,p.water));
+        var sub='Tiap '+p.water+' hari';
+        var badgeTxt=isBad?'Terlambat':'Besok';if(wdays===0)badgeTxt='Hari Ini';
+        var badgeCls=isBad?'late':wdays===0?'today':'tmrw';
+        return '<div class="remind-item"><div class="remind-left"><div class="remind-dot '+(isBad?'bad':wdays===0?'warn':'good')+'"></div><div><div class="remind-name">'+p.name+'</div><div class="remind-sub">'+sub+'</div></div></div><div class="remind-badge '+badgeCls+'">'+badgeTxt+'</div></div>';
+      }).join('');
+    }
   }
-  // recent grid — 6 tanaman terakhir ditambahkan (sorted by added date desc)
+  // tips dinamis berdasarkan jenis koleksi
+  var tip=getSmartTip();
+  var ti=document.getElementById('tipIco');if(ti)ti.textContent=tip.i;
+  var tt=document.getElementById('tipT');if(tt)tt.textContent=tip.t;
+  var tb=document.getElementById('tipB');if(tb)tb.textContent=tip.b;
+  // recent grid — 6 tanaman terakhir ditambahkan (descending by added date)
   var rs=document.getElementById('recentScroll');
   if(rs){
     if(!plants.length){rs.innerHTML='<div style="grid-column:1/-1;padding:16px;font-size:12px;color:var(--muted);font-style:italic;text-align:center">Belum ada tanaman · <span style="color:var(--green);font-weight:700;cursor:pointer" onclick="showScr(\'plants\')">Tambah sekarang →</span></div>';}
     else{
-      var sorted=[].concat(plants).sort(function(a,b){return new Date(b.added||0)-new Date(a.added||0);});
-      rs.innerHTML=sorted.slice(0,6).map(function(p,i){
+      var sorted=[].concat(plants).sort(function(a,b){
+        var da=a.added?new Date(a.added).getTime():0;
+        var db=b.added?new Date(b.added).getTime():0;
+        return db-da;
+      });
+      rs.innerHTML=sorted.slice(0,6).map(function(p){
         var em=p.emoji||typeEmoji(p.type)||'🌿';
-        var imgH=p.image
-          ?'<img src="'+p.image+'" alt="'+p.name+'">'
-          :'<span>'+em+'</span>';
+        var imgH=p.image?'<img src="'+p.image+'" alt="'+p.name+'">'+'<span style="display:none">'+em+'</span>':'<span>'+em+'</span>';
         return '<div class="recent-card" onclick="openDetail(\''+p.id+'\')">'
           +'<div class="recent-img-wrap">'+imgH+'</div>'
-          +'<div class="recent-info">'
-          +'<div class="recent-name">'+p.name+'</div>'
-          +'</div></div>';
+          +'<div class="recent-info"><div class="recent-name">'+p.name+'</div></div>'
+          +'</div>';
       }).join('');
     }
   }
@@ -1429,11 +1489,11 @@ function renderStats(){
   var maxPlantCount=topPlants.length?topPlants[0].count:1;
 
   var html='<div class="stats-period">Bulan Ini · '+mnth+'</div>'
-  // 3 stat cards
+  // 3 stat cards: siram, catatan, tanaman
   +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px;margin-bottom:14px">'
-  +'<div class="stat4" style="text-align:center"><div class="stat4-n" style="color:var(--green)">'+waterMonth+'</div><div class="stat4-l">💧 Siram</div></div>'
+  +'<div class="stat4" style="text-align:center"><div class="stat4-n" style="color:var(--blue)">'+waterMonth+'</div><div class="stat4-l">💧 Siram</div></div>'
   +'<div class="stat4" style="text-align:center"><div class="stat4-n">'+noteMonth+'</div><div class="stat4-l">📝 Catatan</div></div>'
-  +'<div class="stat4" style="text-align:center"><div class="stat4-n" style="color:var(--amber)">'+streak+'</div><div class="stat4-l">🔥 Streak</div></div>'
+  +'<div class="stat4" style="text-align:center"><div class="stat4-n" style="color:var(--green)">'+plants.length+'</div><div class="stat4-l">🌿 Tanaman</div></div>'
   +'</div>'
   // Aktivitas 7 hari
   +'<div style="padding:0 16px;margin-bottom:14px"><div class="jenis-title">Aktivitas 7 Hari Terakhir</div>'
