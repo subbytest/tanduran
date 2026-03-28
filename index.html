@@ -496,6 +496,7 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 <div id="hd">
   <div class="logo">🌿 Tanduran</div>
   <div class="hdr">
+    <button class="hbtn" id="refreshBtn" onclick="doRefresh()" title="Sinkron data">🔄</button>
     <button class="hbtn" id="themeBtn" onclick="toggleTheme()" title="Ganti tema">🌙</button>
     <div class="uchip" id="uchip" onclick="showAccMenu()">👤 <span id="uLabel">—</span></div>
   </div>
@@ -868,14 +869,20 @@ function compressImg(file,maxDim,q){
 async function sbQ(table,method,body,params){
   var url=APIURL+'/api/db/'+table+(params?'?'+params:'');
   try{
-    var opts={method:method,headers:{'Content-Type':'application/json'}};
+    var ctrl=new AbortController();
+    var timer=setTimeout(function(){ctrl.abort();},12000);
+    var opts={method:method,headers:{'Content-Type':'application/json'},signal:ctrl.signal};
     if(method==='POST')opts.headers['Prefer']='return=representation';
     if(body)opts.body=JSON.stringify(body);
     var r=await fetch(url,opts);
-    if(!r.ok)return null;
+    clearTimeout(timer);
+    if(!r.ok){console.warn('[sbQ] HTTP '+r.status+' on '+table);return null;}
     var txt=await r.text();
     return txt?JSON.parse(txt):null;
-  }catch(e){return null;}
+  }catch(e){
+    console.warn('[sbQ] error on '+table+':',e&&e.message||e);
+    return null;
+  }
 }
 
 // ── THEME ──
@@ -961,50 +968,53 @@ function showAccMenu(){
 
 // ── LOAD DATA ──
 async function loadData(){
-  // Selalu fetch langsung dari server — TIDAK pakai localStorage dulu
-  // supaya data selalu sinkron antar device
   showSyncToast();
-  try{
-    var uid=encodeURIComponent(CUID);
-    var sbP=await sbQ('bq_plants','GET',null,'user_id=eq.'+uid+'&order=created_at.asc');
-    if(sbP===null)throw new Error('network');
-    var sbJ=await sbQ('bq_journals','GET',null,'user_id=eq.'+uid+'&order=date.desc');
-    var sbPh=await sbQ('bq_photos','GET',null,'user_id=eq.'+uid+'&order=date.desc');
-    plants=sbP.map(function(r){
-      return{
-        id:r.id,name:r.name,type:r.type,emoji:r.emoji,image:r.image,
-        water:r.water_days,fert:r.fert_days,
-        lastWater:r.last_water,lastFert:r.last_fert,
-        health:r.health,notes:r.notes,added:r.added_at
-      };
-    });
-    jnls=(sbJ||[]).map(function(r){
-      return{id:r.id,plantId:r.plant_id,type:r.type,note:r.note,date:r.date};
-    });
-    fpCache={};
-    (sbPh||[]).forEach(function(p){
-      if(!fpCache[p.plant_id])fpCache[p.plant_id]=[];
-      fpCache[p.plant_id].push({id:p.id,img:p.image,date:p.date});
-    });
-    saveL();
-    hideSyncToast();
-    renderAll();
-    // Sync custom types dari server
-    sbQ('bq_usermeta','GET',null,'user_id=eq.'+uid+'&meta_key=eq.plant_types').then(function(res){
-      if(res&&res.length&&res[0].meta_value){
-        try{
-          var serverTypes=JSON.parse(res[0].meta_value);
-          if(serverTypes&&serverTypes.length){lsS('bq_types_'+CU,serverTypes);renderPlants();renderHome();}
-        }catch(e){}
-      }
-    });
-  }catch(e){
-    // Server tidak bisa diakses — pakai data lokal sebagai fallback
+  var uid=encodeURIComponent(CUID);
+  var sbP=null;
+  // Retry sekali kalau gagal pertama (server cold start)
+  for(var attempt=0;attempt<2;attempt++){
+    sbP=await sbQ('bq_plants','GET',null,'user_id=eq.'+uid+'&order=created_at.asc');
+    if(sbP!==null)break;
+    if(attempt===0)await new Promise(function(r){setTimeout(r,2000);});
+  }
+  if(sbP===null){
+    // Benar-benar tidak bisa reach server
     hideSyncToast();
     plants=ls('bq_p_'+CU,[]);jnls=ls('bq_j_'+CU,[]);fpCache=ls('bq_fp_'+CU,{});
     renderAll();
-    toast('Offline · menampilkan data lokal','w');
+    toast('Tidak dapat terhubung ke server','w',4000);
+    return;
   }
+  var sbJ=await sbQ('bq_journals','GET',null,'user_id=eq.'+uid+'&order=date.desc')||[];
+  var sbPh=await sbQ('bq_photos','GET',null,'user_id=eq.'+uid+'&order=date.desc')||[];
+  plants=sbP.map(function(r){
+    return{
+      id:r.id,name:r.name,type:r.type,emoji:r.emoji,image:r.image,
+      water:r.water_days,fert:r.fert_days,
+      lastWater:r.last_water,lastFert:r.last_fert,
+      health:r.health,notes:r.notes,added:r.added_at
+    };
+  });
+  jnls=sbJ.map(function(r){
+    return{id:r.id,plantId:r.plant_id,type:r.type,note:r.note,date:r.date};
+  });
+  fpCache={};
+  sbPh.forEach(function(p){
+    if(!fpCache[p.plant_id])fpCache[p.plant_id]=[];
+    fpCache[p.plant_id].push({id:p.id,img:p.image,date:p.date});
+  });
+  saveL();
+  hideSyncToast();
+  renderAll();
+  // Sync custom types dari server
+  sbQ('bq_usermeta','GET',null,'user_id=eq.'+uid+'&meta_key=eq.plant_types').then(function(res){
+    if(res&&res.length&&res[0].meta_value){
+      try{
+        var serverTypes=JSON.parse(res[0].meta_value);
+        if(serverTypes&&serverTypes.length){lsS('bq_types_'+CU,serverTypes);renderPlants();renderHome();}
+      }catch(e){}
+    }
+  });
 }
 function showSyncToast(){
   var el=document.getElementById('_syncBar');if(el)return;
@@ -1015,6 +1025,12 @@ function showSyncToast(){
   document.getElementById('app').appendChild(el);
 }
 function hideSyncToast(){var el=document.getElementById('_syncBar');if(el)el.remove();}
+async function doRefresh(){
+  var btn=document.getElementById('refreshBtn');
+  if(btn){btn.style.opacity='0.4';btn.style.pointerEvents='none';}
+  await loadData();
+  if(btn){btn.style.opacity='';btn.style.pointerEvents='';}
+}
 
 // ── NAV ──
 function showScr(n){
