@@ -898,10 +898,14 @@ async function sbQ(table,method,body,params){
     var fetchP=fetch(url,opts);
     var timeoutP=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},6000)});
     var r=await Promise.race([fetchP,timeoutP]);
-    if(!r.ok)return null;
+    if(!r.ok){
+      var errTxt=await r.text();
+      console.error('[sbQ]',method,table,'HTTP',r.status,errTxt);
+      return null;
+    }
     var txt=await r.text();
     return txt?JSON.parse(txt):null;
-  }catch(e){return null;}
+  }catch(e){console.error('[sbQ]',method,table,'ERR',e.message);return null;}
 }
 
 // ── THEME ──
@@ -1533,7 +1537,10 @@ async function saveTL(){
   // Kirim ke server (base64 sudah sangat kecil ~50-80KB)
   var res=await sbQ('bq_photos','POST',{user_id:CUID,plant_id:pid2,image:imgToSave,date:dt,note:note});
   if(!res||!res[0]){
-    toast('Gagal simpan foto — cek koneksi','e',4000);
+    // Cek ukuran data yang dikirim untuk debug
+    var sizeKB=Math.round((imgToSave||'').length*0.75/1024);
+    toast('Gagal simpan foto ('+sizeKB+'KB) — cek koneksi','e',6000);
+    console.error('saveTL failed, img size:',sizeKB,'KB, pid:',pid2,'uid:',CUID);
     if(btn){btn.disabled=false;btn.textContent='💾 Simpan Foto';}
     return;
   }
