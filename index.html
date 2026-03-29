@@ -510,7 +510,8 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 <div class="scr on" id="scr-home">
   <!-- kebun card -->
   <div class="kebun-card" id="kebunCard">
-    <div class="kebun-stats" id="kebunStats" style="margin-top:4px">
+    <div class="kebun-title">Kebun Digital-mu</div>
+    <div class="kebun-stats" id="kebunStats" style="margin-top:9px">
       <div class="kstat"><div class="kstat-n" id="kstatSehat">0</div><div class="kstat-l">Tanaman</div></div>
       <div class="kstat"><div class="kstat-n warn" id="kstatPerhatian">0</div><div class="kstat-l warn">Jenis</div></div>
       <div class="kstat"><div class="kstat-n bad" id="kstatKritis">0</div><div class="kstat-l bad">Perhatian</div></div>
@@ -763,13 +764,18 @@ button,input,select,textarea{font-family:'Nunito',sans-serif}
 'use strict';
 var APIURL='https://api-ruby-two-84.vercel.app';
 var PNKEY='2b10U4FggShOkdudlJPFa6Jpe';
-var IMGBB_KEY='0b7c0abd79ab5e9977b41d4e1a1a7043'; // imgbb free API
+var IMGBB_KEY=''; // isi dengan API key dari imgbb.com jika punya
 
 // Upload foto ke imgbb, return URL atau null kalau gagal
 async function uploadImg(base64data){
   try{
-    // Strip data URL prefix jika ada
     var b64=base64data.indexOf(',')>-1?base64data.split(',')[1]:base64data;
+    // Cek ukuran — base64 1 char = 0.75 byte, limit imgbb ~32MB tapi server kita lebih kecil
+    // Kalau tidak ada key imgbb, langsung return base64 (untuk server yg support)
+    if(!IMGBB_KEY){
+      // Compress ekstra kecil supaya muat di server
+      return base64data;
+    }
     var fd=new FormData();
     fd.append('image',b64);
     var r=await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY,{method:'POST',body:fd});
@@ -1416,7 +1422,15 @@ function pickEmoji(btn,e){document.querySelectorAll('.emoji-opt').forEach(functi
 function onPlantImg(ev){
   var f=ev.target.files[0];if(!f)return;
   if(f.size>10*1024*1024){toast('Foto max 10MB','w');return;}
-  compressImg(f,900,.8).then(function(data){if(!data){toast('Gagal memproses foto','e');return;}addImg=data;document.getElementById('pfPrev').src=data;document.getElementById('pfPrev').style.display='block';document.getElementById('pfIco').style.display='none';document.getElementById('pfTxt').style.display='none';});
+  // Compress ke 500px, quality 0.6 — target ~60-100KB
+  compressImg(f,500,.6).then(function(data){
+    if(!data){toast('Gagal memproses foto','e');return;}
+    addImg=data;
+    document.getElementById('pfPrev').src=data;
+    document.getElementById('pfPrev').style.display='block';
+    document.getElementById('pfIco').style.display='none';
+    document.getElementById('pfTxt').style.display='none';
+  });
 }
 async function savePlant(){
   var name=document.getElementById('pfName').value.trim();if(!name){toast('Nama wajib diisi!','w');return;}
@@ -1432,11 +1446,13 @@ async function savePlant(){
       var existingImg=plants[idx].image||null;
       var finalImg=existingImg;
       if(addImg&&addImg!==existingImg){
-        // Ada foto baru — upload ke imgbb dulu
-        if(btn)btn.textContent='⏳ Upload foto...';
-        var uploaded=await uploadImg(addImg);
-        if(!uploaded){toast('Gagal upload foto — cek koneksi','e',3000);if(btn){btn.disabled=false;btn.textContent='💾 Simpan Tanaman';}return;}
-        finalImg=uploaded;
+        if(IMGBB_KEY){
+          if(btn)btn.textContent='⏳ Upload foto...';
+          var uploaded=await uploadImg(addImg);
+          finalImg=(uploaded&&!uploaded.startsWith('data:'))?uploaded:addImg;
+        }else{
+          finalImg=addImg;
+        }
       }
       data.image=finalImg;
       // Server dulu — tidak simpan lokal kalau server gagal
@@ -1449,10 +1465,13 @@ async function savePlant(){
     var t=today();
     data.image=null;
     if(addImg){
-      if(btn)btn.textContent='⏳ Upload foto...';
-      var uploadedNew=await uploadImg(addImg);
-      if(!uploadedNew){toast('Gagal upload foto — cek koneksi','e',3000);if(btn){btn.disabled=false;btn.textContent='💾 Simpan Tanaman';}return;}
-      data.image=uploadedNew;
+      if(IMGBB_KEY){
+        if(btn)btn.textContent='⏳ Upload foto...';
+        var uploadedNew=await uploadImg(addImg);
+        data.image=(uploadedNew&&!uploadedNew.startsWith('data:'))?uploadedNew:addImg;
+      }else{
+        data.image=addImg;
+      }
     }
     // Server dulu — pakai ID dari server
     var res=await sbQ('bq_plants','POST',{user_id:CUID,name:data.name,type:data.type,emoji:data.emoji,image:data.image,water_days:data.water,fert_days:90,last_water:t,last_fert:t,health:'good',notes:data.notes,added_at:addedAt});
@@ -1485,31 +1504,41 @@ function renderTLGrid(id){
 }
 function openTLSheet(pid2){document.getElementById('tlPid').value=pid2;document.getElementById('tlDate').value=today();document.getElementById('tlPrev').style.display='none';document.getElementById('tlIco').style.display='block';document.getElementById('tlTxt').style.display='block';document.getElementById('tlNote').value='';tlImg=null;document.getElementById('tlSheet').classList.add('open');}
 function closeTLSheet(){document.getElementById('tlSheet').classList.remove('open');tlImg=null;}
-function onTLImg(ev){var f=ev.target.files[0];if(!f)return;compressImg(f,600,.65).then(function(data){if(!data){toast('Gagal memproses foto','e');return;}tlImg=data;document.getElementById('tlPrev').src=data;document.getElementById('tlPrev').style.display='block';document.getElementById('tlIco').style.display='none';document.getElementById('tlTxt').style.display='none';});}
+function onTLImg(ev){
+  var f=ev.target.files[0];if(!f)return;
+  // Compress sangat kecil: 400px, quality 0.5 — target ~50-80KB base64
+  compressImg(f,400,.5).then(function(data){
+    if(!data){toast('Gagal memproses foto','e');return;}
+    tlImg=data;
+    document.getElementById('tlPrev').src=data;
+    document.getElementById('tlPrev').style.display='block';
+    document.getElementById('tlIco').style.display='none';
+    document.getElementById('tlTxt').style.display='none';
+  });
+}
 async function saveTL(){
   if(!tlImg){toast('Pilih foto dulu!','w');return;}
   var pid2=document.getElementById('tlPid').value;
   var dt=document.getElementById('tlDate').value||today();
   var note=document.getElementById('tlNote').value.trim();
   var btn=document.querySelector('#tlSheet .submt');
-  if(btn){btn.disabled=true;btn.textContent='⏳ Mengupload...';}
-  // Upload ke imgbb dulu — dapat URL permanen
-  var imgUrl=await uploadImg(tlImg);
-  if(!imgUrl){
-    toast('Gagal upload foto — cek koneksi','e',4000);
-    if(btn){btn.disabled=false;btn.textContent='💾 Simpan Foto';}
-    return;
+  if(btn){btn.disabled=true;btn.textContent='⏳ Menyimpan...';}
+  var imgToSave=tlImg;
+  // Kalau ada imgbb key, upload dulu dapat URL
+  if(IMGBB_KEY){
+    if(btn)btn.textContent='⏳ Mengupload...';
+    var imgUrl=await uploadImg(tlImg);
+    if(imgUrl&&!imgUrl.startsWith('data:')){imgToSave=imgUrl;}
   }
-  // Simpan URL ke server
-  var res=await sbQ('bq_photos','POST',{user_id:CUID,plant_id:pid2,image:imgUrl,date:dt,note:note});
+  // Kirim ke server (base64 sudah sangat kecil ~50-80KB)
+  var res=await sbQ('bq_photos','POST',{user_id:CUID,plant_id:pid2,image:imgToSave,date:dt,note:note});
   if(!res||!res[0]){
-    toast('Foto terupload tapi gagal disimpan — coba lagi','e',4000);
+    toast('Gagal simpan foto — cek koneksi','e',4000);
     if(btn){btn.disabled=false;btn.textContent='💾 Simpan Foto';}
     return;
   }
-  // Berhasil — simpan ke cache lokal dengan URL (bukan base64)
   if(!fpCache[pid2])fpCache[pid2]=[];
-  fpCache[pid2].unshift({id:res[0].id,img:imgUrl,date:dt,note:note});
+  fpCache[pid2].unshift({id:res[0].id,img:imgToSave,date:dt,note:note});
   saveL();
   if(btn){btn.disabled=false;btn.textContent='💾 Simpan Foto';}
   closeTLSheet();
